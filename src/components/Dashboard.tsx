@@ -12,8 +12,8 @@ import { useState } from 'react'
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 const stats = [
-    { name: 'Total Users', value: '12,847', change: '+12%', changeType: 'positive', icon: UsersIcon },
-    { name: 'Active Sessions', value: '2,341', change: '+8%', changeType: 'positive', icon: ChatBubbleLeftRightIcon },
+    { name: 'Total Users', value: 'N/A', change: '+12%', changeType: 'positive', icon: UsersIcon },
+    { name: 'Active Sessions', value: 'N/A', change: '+8%', changeType: 'positive', icon: ChatBubbleLeftRightIcon },
     { name: 'Monthly Revenue', value: '$45,231', change: '+23%', changeType: 'positive', icon: CreditCardIcon },
     { name: 'AI Response Rate', value: '98.5%', change: '+2.1%', changeType: 'positive', icon: ChartBarIcon },
 ]

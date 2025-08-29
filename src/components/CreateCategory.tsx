@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useEmotionalCategories } from "@/hooks/useEmotionalCategories";
+import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 
 interface Emotion {
   name: string;

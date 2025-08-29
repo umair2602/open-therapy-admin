@@ -3,7 +3,7 @@ export interface Emotion {
 }
 
 export interface EmotionalCategory {
-  id?: string;
+  _id?: string;
   name: string;
   color: string;
   secondary_color: string;

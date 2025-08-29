@@ -2,7 +2,7 @@
 
 import CreateCategory from "@/components/CreateCategory";
 import UpdateCategory from "@/components/UpdateCategory";
-import { useEmotionalCategories } from "@/hooks/useEmotionalCategories";
+import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 import {
   ChartBarIcon,
   CogIcon,
@@ -12,8 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { EmotionalCategory } from "../types";
-
+import { EmotionalCategory } from "@/types";
 export default function Dashboard() {
   const { categories, isLoading, refetch, deleteCategory } =
     useEmotionalCategories()
@@ -186,9 +185,9 @@ export default function Dashboard() {
 
           <div className="p-6">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {categories?.map((category) => (
+              {categories?.map((category, key) => (
                 <div
-                  key={category.id}
+                  key={key}
                   className="border border-gray-200 rounded-lg p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
@@ -206,7 +205,7 @@ export default function Dashboard() {
                         setSelectedCategory(category as EmotionalCategory);
                         setUpdateCategoryVisible(true);
                       }}
-                      className="text-blue-600 cursor-pointer hover:text-blue-700 text-sm font-medium"
+                      className="text-blue-600 ml-auto mr-8 cursor-pointer hover:text-blue-700 text-sm font-medium"
                     >
                       Edit
                     </button>
@@ -316,7 +315,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => {
-                  deleteCategory(categoryToDelete.id as string).then(() => {
+                  deleteCategory(categoryToDelete._id as string).then(() => {
                     setCategoryToDelete(null);
                     setDeleteCategoryVisible(false);
                     refetch()

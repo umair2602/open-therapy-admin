@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import { Emotion, EmotionalCategory } from "@/app/types";
+import { Emotion, EmotionalCategory } from "@/types";
+import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 
 interface UpdateCategoryProps {
   isVisible: boolean;
@@ -16,6 +17,8 @@ export default function UpdateCategory({
   onClose,
   onUpdated,
 }: UpdateCategoryProps) {
+  const { isLoading, updateCategory } = useEmotionalCategories();
+    
   const [category, setCategory] = useState<EmotionalCategory>(initialData);
   const [newEmotion, setNewEmotion] = useState<Emotion>({ name: ""});
 
@@ -40,21 +43,14 @@ export default function UpdateCategory({
   };
 
   const handleSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token"); // your auth token
-      const res = await axios.put(
-        `http://localhost:8000/api/v1/emotional_category/${category.id}`,
-        category,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
-      onUpdated(res.data);
-      onClose();
-    } catch (error) {
-      console.error("Failed to update category", error);
-    }
-  };
+    updateCategory({
+        id: category?._id as string,      // make sure your schema uses `_id`
+        data: category,
+    }).then((c) => {
+        onUpdated(c);
+        onClose();
+    });
+    };
 
   if (!isVisible) return null;
 
@@ -141,9 +137,10 @@ export default function UpdateCategory({
 
           <button
             onClick={handleSubmit}
-            className="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            disabled={isLoading}
+            className="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white disabled:bg-gray-200 bg-blue-600 hover:bg-blue-700"
           >
-            Save Changes
+            {isLoading ? 'Updating...' : 'Save Changes'}
           </button>
         </div>
       </div>

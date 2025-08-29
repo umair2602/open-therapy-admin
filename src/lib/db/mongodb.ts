@@ -1,13 +1,13 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://dev:REwvdw5OjN3taWIh@opentherapy.7jrd0xj.mongodb.net/opentherapy_db?retryWrites=true&w=majority&appName=OpenTherapy'
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
 }
-
 //@ts-ignore
 let cached = global.mongoose
+
 
 if (!cached) {
   //@ts-ignore

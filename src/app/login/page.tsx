@@ -36,7 +36,6 @@ export default function LoginPage() {
                 setError(errorData.message || 'Login failed')
             }
         } catch (err) {
-            console.log('Err',err);
             setError('Network error. Please try again.')
         } finally {
             setIsLoading(false)

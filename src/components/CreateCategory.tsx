@@ -26,7 +26,7 @@ export default function CreateCategory({
   onCreate,
   onClose,
 }: CreateCategoryProps) {
-  const { isLoading, createCategory } = useEmotionalCategories();
+  const { isCreating, createCategory } = useEmotionalCategories();
   const [category, setCategory] = useState<Category>({
     name: "",
     description: "",
@@ -166,9 +166,10 @@ export default function CreateCategory({
 
           <button
             onClick={handleSubmit}
-            className="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-400"
+            disabled={isCreating}
+            className="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white disabled:bg-gray-200 bg-blue-600 hover:bg-blue-400"
           >
-            {isLoading ? "Loading..." : "Save Category"}
+            {isCreating ? "Loading..." : "Save Category"}
           </button>
         </div>
       </div>

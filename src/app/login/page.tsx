@@ -1,6 +1,7 @@
 'use client'
 
 import { EyeIcon, EyeSlashIcon, HeartIcon } from '@heroicons/react/24/outline'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -46,9 +47,7 @@ export default function LoginPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div className="text-center">
-                    <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                        <HeartIcon className="h-8 w-8 text-white" />
-                    </div>
+                    <Image alt='Logo' width={72} height={72} className='rounded-lg mx-auto' src={'/logo.png'}/>
                     <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
                         Admin Login
                     </h2>

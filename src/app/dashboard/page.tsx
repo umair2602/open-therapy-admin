@@ -13,8 +13,9 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { EmotionalCategory } from "@/types";
+import Image from "next/image";
 export default function Dashboard() {
-  const { categories, isLoading, refetch, deleteCategory } =
+  const { categories, isFetching, refetch, deleteCategory } =
     useEmotionalCategories()
 
   const [selectedCategory, setSelectedCategory] = useState<EmotionalCategory>();
@@ -36,7 +37,7 @@ export default function Dashboard() {
     router.push("/login");
   };
 
-  if (isLoading) {
+  if (isFetching) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -54,9 +55,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                <HeartIcon className="h-6 w-6 text-white" />
-              </div>
+              <Image alt='Logo' width={72} height={72} className='rounded-lg mx-auto' src={'/logo.png'}/>
               <span className="text-2xl font-bold text-gray-900">
                 Open Therapy Admin
               </span>

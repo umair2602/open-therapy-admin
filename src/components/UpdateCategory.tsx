@@ -17,7 +17,7 @@ export default function UpdateCategory({
   onClose,
   onUpdated,
 }: UpdateCategoryProps) {
-  const { isLoading, updateCategory } = useEmotionalCategories();
+  const { isUpdating, updateCategory } = useEmotionalCategories();
     
   const [category, setCategory] = useState<EmotionalCategory>(initialData);
   const [newEmotion, setNewEmotion] = useState<Emotion>({ name: ""});
@@ -51,6 +51,7 @@ export default function UpdateCategory({
         onClose();
     });
     };
+
 
   if (!isVisible) return null;
 
@@ -137,10 +138,10 @@ export default function UpdateCategory({
 
           <button
             onClick={handleSubmit}
-            disabled={isLoading}
-            className="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white disabled:bg-gray-200 bg-blue-600 hover:bg-blue-700"
+            disabled={isUpdating}
+            className={`mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white disabled:bg-gray-200 bg-blue-600 hover:bg-blue-700 `}
           >
-            {isLoading ? 'Updating...' : 'Save Changes'}
+            {isUpdating ? 'Updating...' : 'Save Changes'}
           </button>
         </div>
       </div>

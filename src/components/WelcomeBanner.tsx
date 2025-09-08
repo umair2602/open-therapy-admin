@@ -1,6 +1,7 @@
 'use client'
 
 import { HeartIcon, SparklesIcon } from '@heroicons/react/24/outline'
+import Image from 'next/image'
 
 export default function WelcomeBanner() {
     return (
@@ -20,9 +21,10 @@ export default function WelcomeBanner() {
                     <div className="flex-1">
                         {/* Header Section */}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                            <div className="p-4 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl backdrop-blur-sm self-start shadow-lg border border-white/20">
-                                <HeartIcon className="h-8 w-8 sm:h-10 sm:w-10 text-white drop-shadow-lg" />
-                            </div>
+                            {/* <div className="p-4 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl backdrop-blur-sm self-start shadow-lg border border-white/20">
+                                <Image alt='Logo'  className="h-8 w-8 sm:h-10 sm:w-10 text-white drop-shadow-lg" src={'/logo.png'} height={32} width={32} />
+                            </div> */}
+                            <Image alt='Logo'  className="h-12 w-12 rounded-lg text-white drop-shadow-lg" src={'/logo.png'} height={64} width={64} />
                             <div className="flex-1">
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
                                     Welcome to Open Therapy Admin

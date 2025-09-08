@@ -18,20 +18,34 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Fragment, useState } from 'react'
 
-const navigation = [
+type NavigationItem = {
+    name: string
+    href?: string
+    icon: React.ComponentType<any>
+    children?: {
+        name: string
+        href: string
+        icon: React.ComponentType<any>
+    }[]
+}
+
+const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    {
-        name: 'Management',
-        icon: UsersIcon,
-        children: [
-            { name: 'User Management', href: '/users', icon: UsersIcon },
-            { name: 'AI Management', href: '/ai-management', icon: ChatBubbleLeftRightIcon },
-            { name: 'Emotional Categories', href: '/emotional-categories', icon: HeartIcon },
-            { name: 'Content Management', href: '/content', icon: DocumentTextIcon },
-        ]
-    },
+    { name: 'User Management', href: '/users', icon: UsersIcon },
+    { name: 'AI Management', href: '/ai-management', icon: ChatBubbleLeftRightIcon },
+    { name: 'Emotional Categories', href: '/emotional-categories', icon: HeartIcon },
+    { name: 'Content Management', href: '/content', icon: DocumentTextIcon },
     { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
     { name: 'Settings', href: '/settings', icon: CogIcon },
+    // Example with children:
+    // {
+    //     name: 'Management',
+    //     icon: CogIcon,
+    //     children: [
+    //         { name: 'Subitem 1', href: '/sub1', icon: HomeIcon },
+    //         { name: 'Subitem 2', href: '/sub2', icon: UsersIcon }
+    //     ]
+    // }
 ]
 
 interface SidebarProps {

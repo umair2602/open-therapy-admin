@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+
 export interface Emotion {
   name: string;
+  prompt?: string;
 }
 
 export interface EmotionalCategoryDocument extends Document {
@@ -9,11 +11,13 @@ export interface EmotionalCategoryDocument extends Document {
   color: string;
   secondary_color?: string;
   description?: string;
+  prompt?: string;
   emotions: Emotion[];
 }
 
 const EmotionSchema = new Schema<Emotion>({
   name: { type: String, required: true },
+  prompt: { type: String, required: true },
 });
 
 const EmotionalCategorySchema = new Schema<EmotionalCategoryDocument>(
@@ -22,6 +26,7 @@ const EmotionalCategorySchema = new Schema<EmotionalCategoryDocument>(
     color: { type: String, required: true },
     secondary_color: { type: String },
     description: { type: String },
+    prompt: { type: String },
     emotions: { type: [EmotionSchema], default: [] },
   },
   { timestamps: true }

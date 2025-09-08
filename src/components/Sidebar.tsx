@@ -3,39 +3,35 @@
 import { cn } from '@/lib/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import {
-    BookOpenIcon,
     ChartBarIcon,
     ChatBubbleLeftRightIcon,
-    ClockIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
     CogIcon,
-    CreditCardIcon,
     DocumentTextIcon,
     HeartIcon,
     HomeIcon,
-    ShieldCheckIcon,
-    UserGroupIcon,
     UsersIcon
 } from '@heroicons/react/24/outline'
-import { Fragment } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Fragment, useState } from 'react'
 
 const navigation = [
-    { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-    { name: 'User Management', href: '#', icon: UsersIcon, current: false },
-    { name: 'Chat Therapy Sessions', href: '#', icon: ChatBubbleLeftRightIcon, current: false },
-    { name: 'Emotional Diary', href: '#', icon: DocumentTextIcon, current: false },
-
-    { name: 'Personality Tests', href: '#', icon: CogIcon, current: false },
-    { name: 'Stress Scale Assessments', href: '#', icon: ChartBarIcon, current: false },
-    { name: 'Daily Tools', href: '#', icon: BookOpenIcon, current: false },
-    { name: 'Insomnia Tests', href: '#', icon: ClockIcon, current: false },
-    { name: 'Areas of Life', href: '#', icon: HeartIcon, current: false },
-    { name: 'Payment & Subscriptions', href: '#', icon: CreditCardIcon, current: false },
-    { name: 'Video/Audio Sessions', href: '#', icon: UserGroupIcon, current: false },
-    { name: 'AI Model Management', href: '#', icon: CogIcon, current: false },
-    { name: 'Longitudinal Analysis', href: '#', icon: ChartBarIcon, current: false },
-    { name: 'Analytics & Reports', href: '#', icon: ChartBarIcon, current: false },
-    { name: 'Content Management', href: '#', icon: DocumentTextIcon, current: false },
-    { name: 'Security & Compliance', href: '#', icon: ShieldCheckIcon, current: false },
+    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+    {
+        name: 'Management',
+        icon: UsersIcon,
+        children: [
+            { name: 'User Management', href: '/users', icon: UsersIcon },
+            { name: 'AI Management', href: '/ai-management', icon: ChatBubbleLeftRightIcon },
+            { name: 'Emotional Categories', href: '/emotional-categories', icon: HeartIcon },
+            { name: 'Content Management', href: '/content', icon: DocumentTextIcon },
+        ]
+    },
+    { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
+    { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
 interface SidebarProps {
@@ -44,6 +40,20 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ open, setOpen }: SidebarProps) {
+    const pathname = usePathname()
+    const [expandedSections, setExpandedSections] = useState<string[]>(['Management'])
+
+    const toggleSection = (sectionName: string) => {
+        setExpandedSections(prev =>
+            prev.includes(sectionName)
+                ? prev.filter(name => name !== sectionName)
+                : [...prev, sectionName]
+        )
+    }
+
+    const isActive = (href: string) => pathname === href
+    const isParentActive = (children: any[]) => children.some(child => isActive(child.href))
+
     return (
         <>
             {/* Mobile sidebar */}
@@ -74,39 +84,110 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
                             <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
                                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
                                     <div className="flex h-16 shrink-0 items-center">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                                                <HeartIcon className="h-5 w-5 text-white" />
+                                        <div className="flex items-center space-x-3">
+                                            <div className="h-10 w-10 relative">
+                                                <Image
+                                                    src="/logo.png"
+                                                    alt="Open Therapy"
+                                                    fill
+                                                    className="object-contain"
+                                                />
                                             </div>
-                                            <span className="text-xl font-bold text-gray-900">Open Therapy</span>
+                                            <div>
+                                                <span className="text-xl font-bold text-gray-900">Open Therapy</span>
+                                                <p className="text-xs text-gray-500">Admin Panel</p>
+                                            </div>
                                         </div>
                                     </div>
                                     <nav className="flex flex-1 flex-col">
                                         <ul role="list" className="flex flex-1 flex-col gap-y-7">
                                             <li>
                                                 <ul role="list" className="-mx-2 space-y-1">
-                                                    {navigation.map((item) => (
-                                                        <li key={item.name}>
-                                                            <a
-                                                                href={item.href}
-                                                                className={cn(
-                                                                    item.current
-                                                                        ? 'bg-gray-50 text-blue-600'
-                                                                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
-                                                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                                                )}
-                                                            >
-                                                                <item.icon
-                                                                    className={cn(
-                                                                        item.current ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
-                                                                        'h-6 w-6 shrink-0'
+                                                    {navigation.map((item) => {
+                                                        if (item.children) {
+                                                            const isExpanded = expandedSections.includes(item.name)
+                                                            const hasActiveChild = isParentActive(item.children)
+
+                                                            return (
+                                                                <li key={item.name}>
+                                                                    <button
+                                                                        onClick={() => toggleSection(item.name)}
+                                                                        className={cn(
+                                                                            hasActiveChild
+                                                                                ? 'bg-blue-50 text-blue-700'
+                                                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+                                                                            'group flex w-full items-center gap-x-3 rounded-md p-3 text-sm leading-6 font-medium transition-colors'
+                                                                        )}
+                                                                    >
+                                                                        <item.icon
+                                                                            className={cn(
+                                                                                hasActiveChild ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                                'h-6 w-6 shrink-0'
+                                                                            )}
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                        {item.name}
+                                                                        {isExpanded ? (
+                                                                            <ChevronDownIcon className="ml-auto h-4 w-4 text-gray-400" />
+                                                                        ) : (
+                                                                            <ChevronRightIcon className="ml-auto h-4 w-4 text-gray-400" />
+                                                                        )}
+                                                                    </button>
+                                                                    {isExpanded && (
+                                                                        <ul className="ml-6 mt-1 space-y-1">
+                                                                            {item.children.map((child) => (
+                                                                                <li key={child.name}>
+                                                                                    <Link
+                                                                                        href={child.href}
+                                                                                        onClick={() => setOpen(false)}
+                                                                                        className={cn(
+                                                                                            isActive(child.href)
+                                                                                                ? 'bg-blue-50 text-blue-700'
+                                                                                                : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50',
+                                                                                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                                                                                        )}
+                                                                                    >
+                                                                                        <child.icon
+                                                                                            className={cn(
+                                                                                                isActive(child.href) ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                                                'h-5 w-5 shrink-0'
+                                                                                            )}
+                                                                                            aria-hidden="true"
+                                                                                        />
+                                                                                        {child.name}
+                                                                                    </Link>
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
                                                                     )}
-                                                                    aria-hidden="true"
-                                                                />
-                                                                {item.name}
-                                                            </a>
-                                                        </li>
-                                                    ))}
+                                                                </li>
+                                                            )
+                                                        } else {
+                                                            return (
+                                                                <li key={item.name}>
+                                                                    <Link
+                                                                        href={item.href!}
+                                                                        onClick={() => setOpen(false)}
+                                                                        className={cn(
+                                                                            isActive(item.href!)
+                                                                                ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                                                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+                                                                            'group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-medium transition-colors'
+                                                                        )}
+                                                                    >
+                                                                        <item.icon
+                                                                            className={cn(
+                                                                                isActive(item.href!) ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                                'h-6 w-6 shrink-0'
+                                                                            )}
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                        {item.name}
+                                                                    </Link>
+                                                                </li>
+                                                            )
+                                                        }
+                                                    })}
                                                 </ul>
                                             </li>
                                         </ul>
@@ -120,41 +201,110 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
 
             {/* Desktop sidebar */}
             <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4 shadow-lg">
                     <div className="flex h-16 shrink-0 items-center">
-                        <div className="flex items-center space-x-2">
-                            <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                                <HeartIcon className="h-5 w-5 text-white" />
+                        <div className="flex items-center space-x-3">
+                            <div className="h-10 w-10 relative">
+                                <Image
+                                    src="/logo.png"
+                                    alt="Open Therapy"
+                                    fill
+                                    className="object-contain"
+                                />
                             </div>
-                            <span className="text-xl font-bold text-gray-900">Open Therapy</span>
+                            <div>
+                                <span className="text-xl font-bold text-gray-900">Open Therapy</span>
+                                <p className="text-xs text-gray-500">Admin Panel</p>
+                            </div>
                         </div>
                     </div>
                     <nav className="flex flex-1 flex-col">
                         <ul role="list" className="flex flex-1 flex-col gap-y-7">
                             <li>
                                 <ul role="list" className="-mx-2 space-y-1">
-                                    {navigation.map((item) => (
-                                        <li key={item.name}>
-                                            <a
-                                                href={item.href}
-                                                className={cn(
-                                                    item.current
-                                                        ? 'bg-gray-50 text-blue-600'
-                                                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
-                                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                                )}
-                                            >
-                                                <item.icon
-                                                    className={cn(
-                                                        item.current ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
-                                                        'h-6 w-6 shrink-0'
+                                    {navigation.map((item) => {
+                                        if (item.children) {
+                                            const isExpanded = expandedSections.includes(item.name)
+                                            const hasActiveChild = isParentActive(item.children)
+
+                                            return (
+                                                <li key={item.name}>
+                                                    <button
+                                                        onClick={() => toggleSection(item.name)}
+                                                        className={cn(
+                                                            hasActiveChild
+                                                                ? 'bg-blue-50 text-blue-700'
+                                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+                                                            'group flex w-full items-center gap-x-3 rounded-md p-3 text-sm leading-6 font-medium transition-colors'
+                                                        )}
+                                                    >
+                                                        <item.icon
+                                                            className={cn(
+                                                                hasActiveChild ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                'h-6 w-6 shrink-0'
+                                                            )}
+                                                            aria-hidden="true"
+                                                        />
+                                                        {item.name}
+                                                        {isExpanded ? (
+                                                            <ChevronDownIcon className="ml-auto h-4 w-4 text-gray-400" />
+                                                        ) : (
+                                                            <ChevronRightIcon className="ml-auto h-4 w-4 text-gray-400" />
+                                                        )}
+                                                    </button>
+                                                    {isExpanded && (
+                                                        <ul className="ml-6 mt-1 space-y-1">
+                                                            {item.children.map((child) => (
+                                                                <li key={child.name}>
+                                                                    <Link
+                                                                        href={child.href}
+                                                                        className={cn(
+                                                                            isActive(child.href)
+                                                                                ? 'bg-blue-50 text-blue-700'
+                                                                                : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50',
+                                                                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-medium transition-colors'
+                                                                        )}
+                                                                    >
+                                                                        <child.icon
+                                                                            className={cn(
+                                                                                isActive(child.href) ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                                'h-5 w-5 shrink-0'
+                                                                            )}
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                        {child.name}
+                                                                    </Link>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
                                                     )}
-                                                    aria-hidden="true"
-                                                />
-                                                {item.name}
-                                            </a>
-                                        </li>
-                                    ))}
+                                                </li>
+                                            )
+                                        } else {
+                                            return (
+                                                <li key={item.name}>
+                                                    <Link
+                                                        href={item.href!}
+                                                        className={cn(
+                                                            isActive(item.href!)
+                                                                ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+                                                            'group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-medium transition-colors'
+                                                        )}
+                                                    >
+                                                        <item.icon
+                                                            className={cn(
+                                                                isActive(item.href!) ? 'text-blue-700' : 'text-gray-400 group-hover:text-blue-600',
+                                                                'h-6 w-6 shrink-0'
+                                                            )}
+                                                            aria-hidden="true"
+                                                        />
+                                                        {item.name}
+                                                    </Link>
+                                                </li>
+                                            )
+                                        }
+                                    })}
                                 </ul>
                             </li>
                         </ul>

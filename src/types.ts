@@ -12,3 +12,6 @@ export interface EmotionalCategory {
   prompt?: string;
   emotions: Emotion[];
 }
+
+// Re-export Bloom Global Prompt types
+export * from "./types/BloomGlobalPrompt";

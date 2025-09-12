@@ -8,6 +8,8 @@ import {
   CheckIcon,
   XMarkIcon,
   PlusIcon,
+  CodeBracketIcon,
+  EyeIcon,
 } from "@heroicons/react/24/outline";
 import { BloomGlobalPrompt, DEFAULT_BLOOM_GLOBAL_PROMPT } from "@/types";
 import CollapsibleSection from "./BloomGlobalPrompt/CollapsibleSection";
@@ -40,14 +42,23 @@ export default function BloomGlobalPromptContent() {
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "metadata",
   ]);
+  const [systemPrompt, setSystemPrompt] = useState<string>("");
+  const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
+  const [showSystemPrompt, setShowSystemPrompt] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [ageGroup, setAgeGroup] =
+    useState<BloomGlobalPrompt["ageGroup"]>("adult");
 
   useEffect(() => {
     loadPrompt();
-  }, []);
+  }, [ageGroup]);
 
   const loadPrompt = async () => {
     try {
-      const response = await fetch("/api/bloom-global-prompt");
+      const response = await fetch(
+        `/api/bloom-global-prompt?ageGroup=${ageGroup}`
+      );
       const data = await response.json();
       setPrompt(data);
       setIsLoading(false);
@@ -99,6 +110,27 @@ export default function BloomGlobalPromptContent() {
     );
   };
 
+  const generateSystemPrompt = async () => {
+    setIsGeneratingPrompt(true);
+    try {
+      const response = await fetch(
+        `/api/bloom-global-prompt/generate?ageGroup=${ageGroup}`
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setSystemPrompt(data.data.systemPrompt);
+        setShowSystemPrompt(true);
+      } else {
+        console.error("Error generating system prompt:", data.error);
+      }
+    } catch (error) {
+      console.error("Error generating system prompt:", error);
+    } finally {
+      setIsGeneratingPrompt(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -130,6 +162,28 @@ export default function BloomGlobalPromptContent() {
             <div className="text-sm text-gray-500">
               Version {prompt.version} • {prompt.status}
             </div>
+            <select
+              value={ageGroup}
+              onChange={(e) => setAgeGroup(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="adolescence">Adolescence (13–17)</option>
+              <option value="young_adult">Young adults (18–24)</option>
+              <option value="adult">Adults (25–39)</option>
+              <option value="middle_age">Middle age (40–59)</option>
+            </select>
+            <button
+              onClick={generateSystemPrompt}
+              disabled={isGeneratingPrompt}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                isGeneratingPrompt
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              <CodeBracketIcon className="h-4 w-4 mr-2 inline" />
+              {isGeneratingPrompt ? "Generating..." : "Generate System Prompt"}
+            </button>
             <button
               onClick={savePrompt}
               disabled={isSaving}
@@ -337,6 +391,47 @@ export default function BloomGlobalPromptContent() {
           />
         </CollapsibleSection>
       </div>
+
+      {/* System Prompt Modal */}
+      {showSystemPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Generated System Prompt
+              </h2>
+              <button
+                onClick={() => setShowSystemPrompt(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              <pre className="whitespace-pre-wrap text-sm text-gray-700 bg-gray-50 p-4 rounded-lg overflow-auto">
+                {systemPrompt}
+              </pre>
+            </div>
+            <div className="flex items-center justify-end space-x-3 p-6 border-t">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(systemPrompt);
+                  // You could add a toast notification here
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Copy to Clipboard
+              </button>
+              <button
+                onClick={() => setShowSystemPrompt(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

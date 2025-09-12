@@ -1,6 +1,7 @@
 // Bloom Global Prompt Configuration Types
 
 export interface BloomGlobalPrompt {
+  ageGroup: AgeGroup;
   id: string;
   slug: string;
   type: string;
@@ -27,6 +28,12 @@ export interface BloomGlobalPrompt {
   createdAt: string;
   updatedAt: string;
 }
+
+export type AgeGroup =
+  | "adolescence" // 13–17
+  | "young_adult" // 18–24
+  | "adult" // 25–39
+  | "middle_age"; // 40–59
 
 export interface ConversationRules {
   maxSentences: number;
@@ -178,6 +185,7 @@ export interface OperationalNotes {
 
 // Default values for Bloom Global Prompt
 export const DEFAULT_BLOOM_GLOBAL_PROMPT: BloomGlobalPrompt = {
+  ageGroup: "adult",
   id: "bloom-global-prompt-v1",
   slug: "bloom-global-prompt",
   type: "therapeutic",

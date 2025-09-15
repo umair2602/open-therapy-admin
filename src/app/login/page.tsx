@@ -4,7 +4,7 @@ import { EyeIcon, EyeSlashIcon, HeartIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function LoginPage() {
     const [username, setUsername] = useState('')
@@ -42,6 +42,13 @@ export default function LoginPage() {
             setIsLoading(false)
         }
     }
+
+    useEffect(() => {
+        const token = localStorage.getItem("adminToken");
+        if (token) {
+          router.replace("/dashboard");
+        }
+      }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

@@ -94,12 +94,34 @@ export default function BloomGlobalPromptContent() {
     }
   };
 
+  const isObject = (val: unknown): val is Record<string, unknown> =>
+    !!val && typeof val === "object" && !Array.isArray(val);
+
+  const deepMerge = <T extends Record<string, any>>(
+    base: T,
+    patch: Partial<T>
+  ): T => {
+    const result: any = { ...base };
+    for (const key in patch) {
+      const nextVal = (patch as any)[key];
+      const prevVal = (base as any)[key];
+      if (isObject(prevVal) && isObject(nextVal)) {
+        result[key] = deepMerge(prevVal, nextVal);
+      } else {
+        result[key] = nextVal;
+      }
+    }
+    return result;
+  };
+
   const updatePrompt = (updates: Partial<BloomGlobalPrompt>) => {
-    setPrompt((prev) => ({
-      ...prev,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    }));
+    setPrompt((prev) => {
+      const merged = deepMerge(prev, updates);
+      return {
+        ...merged,
+        updatedAt: new Date().toISOString(),
+      };
+    });
   };
 
   const toggleSection = (sectionId: string) => {

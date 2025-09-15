@@ -3,5 +3,6 @@ export const API_CONFIG = {
 };
 
 export const API_ENDPOINTS = {
-  EMOTIONAL_CATEGORY: "/emotional_category",  // matches app/api/emotionalCategories/route.ts
+  EMOTIONAL_CATEGORY: "/emotional_category", // matches app/api/emotionalCategories/route.ts
+  CRISIS_PROMPT: "/crisis_prompt",
 };

@@ -13,6 +13,7 @@ import {
   HomeIcon,
   UsersIcon,
   CommandLineIcon,
+  ShieldExclamationIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +48,11 @@ const navigation: NavigationItem[] = [
     name: "Emotional Categories",
     href: "/emotional-categories",
     icon: HeartIcon,
+  },
+  {
+    name: "Crisis Prompts",
+    href: "/crisis-prompts",
+    icon: ShieldExclamationIcon,
   },
   { name: "Content Management", href: "/content", icon: DocumentTextIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },

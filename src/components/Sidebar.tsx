@@ -40,19 +40,25 @@ const navigation: NavigationItem[] = [
     icon: ChatBubbleLeftRightIcon,
   },
   {
-    name: "Bloom Global Prompt",
-    href: "/bloom-global-prompt",
+    name: "AI Prompts",
     icon: CommandLineIcon,
+    children: [
+      {
+        name: "Global Prompt",
+        href: "/bloom-global-prompt",
+        icon: CommandLineIcon,
+      },
+      {
+        name: "Crisis Prompts",
+        href: "/crisis-prompts",
+        icon: ShieldExclamationIcon,
+      },
+    ],
   },
   {
     name: "Emotional Categories",
     href: "/emotional-categories",
     icon: HeartIcon,
-  },
-  {
-    name: "Crisis Prompts",
-    href: "/crisis-prompts",
-    icon: ShieldExclamationIcon,
   },
   { name: "Content Management", href: "/content", icon: DocumentTextIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },

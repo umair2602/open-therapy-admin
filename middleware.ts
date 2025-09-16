@@ -25,7 +25,7 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("admin_token")?.value;
   if (!token) {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("next", pathname);
+    // loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -34,7 +34,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   } catch {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("next", pathname);
+    // loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 }

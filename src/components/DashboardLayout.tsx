@@ -20,6 +20,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
+    console.log("token", token);
     if (!token) {
       router.replace("/login");
     }

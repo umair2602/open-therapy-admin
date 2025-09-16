@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
         email: adminUser.email,
         role: adminUser.role,
       },
+      token: token,
     });
 
     // Set httpOnly cookie

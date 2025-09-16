@@ -13,18 +13,31 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    router.push("/login");
-  };
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    console.log("token", token);
-    if (!token) {
-      router.replace("/login");
+      if (response.ok) {
+        // Optionally parse server response
+        const data = await response.json();
+        console.log("Logout successful:", data);
+      } else {
+        const errorData = await response.json();
+        console.error("Logout failed:", errorData);
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      // Clean up client state
+      localStorage.removeItem("adminToken");
+      router.push("/login");
     }
-  }, []);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -49,6 +49,11 @@ const navigation: NavigationItem[] = [
         icon: CommandLineIcon,
       },
       {
+        name: "Life Area Prompts",
+        href: "/life-area-prompt",
+        icon: ShieldExclamationIcon,
+      },
+      {
         name: "Crisis Prompts",
         href: "/crisis-prompts",
         icon: ShieldExclamationIcon,

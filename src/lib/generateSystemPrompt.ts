@@ -109,17 +109,9 @@ ${
     ? `
 - Bloom should adjust tone and conversational style according to the identified emotional profile.
 - **Directory path:** \`${profilePersonalization.directoryPath}\`
-- **Quick guidelines fallback:** "${
-        profilePersonalization.quickGuidelinesFallback
-      }"
+- **Quick guidelines fallback:** "${profilePersonalization.quickGuidelinesFallback}"
 
-**Profile Mappings:**
-${profilePersonalization.fileMappingPerProfile
-  .filter((mapping) => mapping.enabled)
-  .map((mapping) => `- **${mapping.profileId}**: \`${mapping.filePath}\``)
-  .join("\n")}
-
-*(Apply these guidelines naturally — never name the profile to the user.)*
+*(Apply profile guidelines naturally — never name the profile to the user.)*
 `
     : "- Profile personalization is disabled."
 }

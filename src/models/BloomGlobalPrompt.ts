@@ -42,17 +42,33 @@ export interface IProgressionLayers {
   confirmationText: string;
 }
 
-export interface IProfileMapping {
-  profileId: string;
-  filePath: string;
-  enabled: boolean;
-}
-
 export interface IProfilePersonalization {
   enabled: boolean;
   directoryPath: string;
-  fileMappingPerProfile: IProfileMapping[];
   quickGuidelinesFallback: string;
+  profiles?: IEmotionalProfile[];
+}
+
+export interface IEmotionalProfile {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  opening: string;
+  positiveAspects: string;
+  challengingAspects: string;
+  mainChallenges: string;
+  goals: string;
+  bloomTone: string;
+  briefDescription: string;
+  keywords: {
+    positive: string[];
+    challenging: string[];
+  };
+  wayOfFeeling: string;
+  selfCarePaths: string;
+  dailyPractices: string[];
+  interventions: string;
 }
 
 export interface IEmotionOpeningMapping {
@@ -239,21 +255,46 @@ const ProgressionLayersSchema = new Schema<IProgressionLayers>(
   { _id: false }
 );
 
-const ProfileMappingSchema = new Schema<IProfileMapping>(
-  {
-    profileId: { type: String, required: true },
-    filePath: { type: String, required: true },
-    enabled: { type: Boolean, required: true },
-  },
-  { _id: false }
-);
-
 const ProfilePersonalizationSchema = new Schema<IProfilePersonalization>(
   {
     enabled: { type: Boolean, required: true },
     directoryPath: { type: String, required: true },
-    fileMappingPerProfile: [ProfileMappingSchema],
     quickGuidelinesFallback: { type: String, required: true },
+    profiles: {
+      type: [
+        new Schema<IEmotionalProfile>(
+          {
+            id: { type: String, required: true },
+            name: { type: String, required: true },
+            description: { type: String, required: true },
+            enabled: { type: Boolean, required: true },
+            opening: { type: String, required: true },
+            positiveAspects: { type: String, required: true },
+            challengingAspects: { type: String, required: true },
+            mainChallenges: { type: String, required: true },
+            goals: { type: String, required: true },
+            bloomTone: { type: String, required: true },
+            briefDescription: { type: String, required: true },
+            keywords: {
+              type: new Schema(
+                {
+                  positive: { type: [String], required: true },
+                  challenging: { type: [String], required: true },
+                },
+                { _id: false }
+              ),
+              required: true,
+            },
+            wayOfFeeling: { type: String, required: true },
+            selfCarePaths: { type: String, required: true },
+            dailyPractices: { type: [String], required: true },
+            interventions: { type: String, required: true },
+          },
+          { _id: false }
+        ),
+      ],
+      required: false,
+    },
   },
   { _id: false }
 );

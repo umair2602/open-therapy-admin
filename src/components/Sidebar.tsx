@@ -48,11 +48,11 @@ const navigation: NavigationItem[] = [
         href: "/bloom-global-prompt",
         icon: CommandLineIcon,
       },
-      {
-        name: "Life Area Prompts",
-        href: "/life-area-prompt",
-        icon: ShieldExclamationIcon,
-      },
+      // {
+      //   name: "Life Area Prompts",
+      //   href: "/life-area-prompt",
+      //   icon: ShieldExclamationIcon,
+      // },
       {
         name: "Crisis Prompts",
         href: "/crisis-prompts",

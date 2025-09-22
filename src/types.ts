@@ -1,6 +1,7 @@
 export interface Emotion {
   name: string;
   prompt?: string;
+  points?: number;
 }
 
 export interface EmotionalCategory {
@@ -10,6 +11,7 @@ export interface EmotionalCategory {
   secondary_color: string;
   description: string | null;
   prompt?: string;
+  type: "healthy" | "unhealthy";
   emotions: Emotion[];
 }
 

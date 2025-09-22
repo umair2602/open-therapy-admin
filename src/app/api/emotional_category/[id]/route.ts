@@ -17,7 +17,10 @@ export async function GET(
     return NextResponse.json(category, { status: 200 });
   } catch (error) {
     console.error("GET category error:", error);
-    return NextResponse.json({ message: "Error fetching category" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error fetching category" },
+      { status: 500 }
+    );
   }
 }
 
@@ -31,8 +34,22 @@ export async function PUT(
   try {
     console.log("Id is", id);
     const body = await req.json();
+    // Normalize payload: coerce emotion.points to number if provided
+    if (Array.isArray(body?.emotions)) {
+      body.emotions = body.emotions.map((emotion: any) => ({
+        ...emotion,
+        points:
+          emotion?.points === undefined ||
+          emotion?.points === null ||
+          emotion?.points === ""
+            ? undefined
+            : Number.parseInt(emotion.points as any, 10),
+      }));
+    }
+    // Ensure validation runs on update
     const category = await EmotionalCategory.findByIdAndUpdate(id, body, {
       new: true,
+      runValidators: true,
     });
     if (!category) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
@@ -40,7 +57,10 @@ export async function PUT(
     return NextResponse.json(category, { status: 200 });
   } catch (error) {
     console.error("PUT category error:", error);
-    return NextResponse.json({ message: "Error updating category" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error updating category" },
+      { status: 500 }
+    );
   }
 }
 
@@ -59,6 +79,9 @@ export async function DELETE(
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("DELETE category error:", error);
-    return NextResponse.json({ message: "Error deleting category" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error deleting category" },
+      { status: 500 }
+    );
   }
 }

@@ -1,6 +1,11 @@
 import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 import { Emotion, EmotionalCategory } from "@/types";
-import { PlusIcon, SparklesIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  SparklesIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 interface CreateCategoryProps {
@@ -22,10 +27,15 @@ export default function CreateCategory({
     color: "#3B82F6",
     secondary_color: "#8B5CF6",
     prompt: "",
+    type: "healthy",
     emotions: [],
   });
 
-  const [newEmotion, setNewEmotion] = useState<Emotion>({ name: "", prompt: "" });
+  const [newEmotion, setNewEmotion] = useState<Emotion>({
+    name: "",
+    prompt: "",
+    points: 0,
+  });
 
   const handleAddEmotion = () => {
     if (!newEmotion.name.trim()) return;
@@ -33,7 +43,7 @@ export default function CreateCategory({
       ...category,
       emotions: [...category.emotions, { ...newEmotion }],
     });
-    setNewEmotion({ name: "", prompt: "" });
+    setNewEmotion({ name: "", prompt: "", points: 0 });
   };
 
   const handleDeleteEmotion = (index: number) => {
@@ -45,6 +55,7 @@ export default function CreateCategory({
 
   const handleSubmit = () => {
     // onSubmit(category);
+    console.log("Creating category", category);
     createCategory(category).then((c) => {
       console.log("Created", c);
     });
@@ -66,8 +77,12 @@ export default function CreateCategory({
                   <SparklesIcon className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Create Emotional Category</h3>
-                  <p className="text-purple-100 text-sm">Add a new category with emotions and AI prompts</p>
+                  <h3 className="text-xl font-bold text-white">
+                    Create Emotional Category
+                  </h3>
+                  <p className="text-purple-100 text-sm">
+                    Add a new category with emotions and AI prompts
+                  </p>
                 </div>
               </div>
               <button
@@ -95,7 +110,9 @@ export default function CreateCategory({
                     type="text"
                     placeholder="e.g., Anxiety, Joy, Anger"
                     value={category.name}
-                    onChange={(e) => setCategory({ ...category, name: e.target.value })}
+                    onChange={(e) =>
+                      setCategory({ ...category, name: e.target.value })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
                 </div>
@@ -107,9 +124,29 @@ export default function CreateCategory({
                     type="text"
                     placeholder="Brief description of this category"
                     value={category.description || ""}
-                    onChange={(e) => setCategory({ ...category, description: e.target.value })}
+                    onChange={(e) =>
+                      setCategory({ ...category, description: e.target.value })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category Type *
+                  </label>
+                  <select
+                    value={category.type}
+                    onChange={(e) =>
+                      setCategory({
+                        ...category,
+                        type: e.target.value as EmotionalCategory["type"],
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                  >
+                    <option value="healthy">Healthy</option>
+                    <option value="unhealthy">Unhealthy</option>
+                  </select>
                 </div>
               </div>
 
@@ -120,12 +157,15 @@ export default function CreateCategory({
                 <textarea
                   placeholder="Describe what this emotional category represents in daily life. This helps the AI understand and respond appropriately in therapy sessions and diary analysis."
                   value={category.prompt || ""}
-                  onChange={(e) => setCategory({ ...category, prompt: e.target.value })}
+                  onChange={(e) =>
+                    setCategory({ ...category, prompt: e.target.value })
+                  }
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors resize-none"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  This prompt helps the AI understand the context and meaning of this emotional category.
+                  This prompt helps the AI understand the context and meaning of
+                  this emotional category.
                 </p>
               </div>
 
@@ -139,7 +179,9 @@ export default function CreateCategory({
                     <input
                       type="color"
                       value={category.color}
-                      onChange={(e) => setCategory({ ...category, color: e.target.value })}
+                      onChange={(e) =>
+                        setCategory({ ...category, color: e.target.value })
+                      }
                       className="w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer"
                     />
                   </div>
@@ -148,7 +190,12 @@ export default function CreateCategory({
                     <input
                       type="color"
                       value={category.secondary_color}
-                      onChange={(e) => setCategory({ ...category, secondary_color: e.target.value })}
+                      onChange={(e) =>
+                        setCategory({
+                          ...category,
+                          secondary_color: e.target.value,
+                        })
+                      }
                       className="w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer"
                     />
                   </div>
@@ -172,7 +219,9 @@ export default function CreateCategory({
                       type="text"
                       placeholder="e.g., Worry, Excitement, Frustration"
                       value={newEmotion.name}
-                      onChange={(e) => setNewEmotion({ ...newEmotion, name: e.target.value })}
+                      onChange={(e) =>
+                        setNewEmotion({ ...newEmotion, name: e.target.value })
+                      }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
@@ -183,9 +232,31 @@ export default function CreateCategory({
                     <textarea
                       placeholder="Describe what this emotion represents and how it manifests in daily life..."
                       value={newEmotion.prompt || ""}
-                      onChange={(e) => setNewEmotion({ ...newEmotion, prompt: e.target.value })}
+                      onChange={(e) =>
+                        setNewEmotion({ ...newEmotion, prompt: e.target.value })
+                      }
                       rows={2}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Emotion Points (optional)
+                    </label>
+                    <input
+                      type="number"
+                      value={newEmotion.points ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setNewEmotion({
+                          ...newEmotion,
+                          points:
+                            value === "" ? undefined : parseInt(value, 10),
+                        });
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -220,6 +291,11 @@ export default function CreateCategory({
                         {emotion.prompt && (
                           <p className="text-xs text-gray-600 leading-relaxed">
                             {emotion.prompt}
+                          </p>
+                        )}
+                        {typeof emotion.points === "number" && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            Points: {emotion.points}
                           </p>
                         )}
                       </div>

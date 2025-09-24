@@ -198,7 +198,7 @@ export default function BloomGlobalPromptContent() {
               <option value="adolescence">Adolescence (13–17)</option>
               <option value="young_adult">Young adults (18–24)</option>
               <option value="adult">Adults (25–39)</option>
-              <option value="middle_age">Middle age (40–59)</option>
+              <option value="middle_age">Middle age (40+)</option>
             </select>
             <button
               onClick={generateSystemPrompt}

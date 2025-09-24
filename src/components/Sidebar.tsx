@@ -18,7 +18,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 type NavigationItem = {
   name: string;
@@ -89,6 +89,20 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "Management",
   ]);
+
+  useEffect(() => {
+    const parents = navigation
+      .filter((item) => item.children && item.children.some((c) => c.href === pathname))
+      .map((i) => i.name);
+
+    if (parents.length === 0) return;
+
+    setExpandedSections((prev) => {
+      const setNames = new Set(prev);
+      parents.forEach((p) => setNames.add(p));
+      return Array.from(setNames);
+    });
+  }, [pathname]);
 
   const toggleSection = (sectionName: string) => {
     setExpandedSections((prev) =>

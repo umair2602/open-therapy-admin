@@ -66,7 +66,7 @@ export default function CreateCategory({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+    <div className="fixed inset-0 bg-black/40 overflow-y-auto h-full w-full z-50">
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}

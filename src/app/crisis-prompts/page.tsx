@@ -9,6 +9,7 @@ import {
   PencilIcon,
   TrashIcon,
   ShieldExclamationIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 export default function CrisisPromptsPage() {
@@ -71,7 +72,7 @@ export default function CrisisPromptsPage() {
       onChange(next);
     };
     return (
-      <div>
+      <div className="px-6">
         <div className="mb-1 text-sm font-medium text-gray-700">{label}</div>
         <div className="flex flex-wrap gap-2 mb-2">
           {(values || []).map((v, i) => (
@@ -245,9 +246,9 @@ export default function CrisisPromptsPage() {
 
         {isCreating && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-2 sm:p-6">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-5xl space-y-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">
+            <div className="bg-white rounded-2xl w-full max-w-5xl space-y-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
+              <div className="flex bg-gradient-to-r from-red-600 to-pink-600 p-6 items-center justify-between">
+                <h2 className="text-xl font-semibold text-white">
                   {editing ? "Edit Crisis Prompt" : "Create Crisis Prompt"}
                 </h2>
                 <button
@@ -257,7 +258,7 @@ export default function CrisisPromptsPage() {
                   }}
                   className="text-gray-500"
                 >
-                  Close
+                  <XMarkIcon className="h-6 text-white w-6" />
                 </button>
               </div>
 
@@ -384,7 +385,7 @@ export default function CrisisPromptsPage() {
                 values={form.do_not_do || []}
                 onChange={(arr) => setForm({ ...form, do_not_do: arr })}
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 px-6 md:grid-cols-2 gap-4">
                 <input
                   className="border rounded-lg p-2"
                   placeholder="ID"
@@ -427,7 +428,8 @@ export default function CrisisPromptsPage() {
                 />
               </div>
 
-              <textarea
+              <div className="px-6">
+                <textarea
                 className="border rounded-lg p-2 w-full"
                 rows={3}
                 placeholder="Description"
@@ -457,8 +459,9 @@ export default function CrisisPromptsPage() {
                   })
                 }
               />
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 px-6 gap-4">
                 <input
                   className="border rounded-lg p-2"
                   placeholder="Variant micro"
@@ -512,13 +515,13 @@ export default function CrisisPromptsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2">
+              <div className="flex items-center justify-end p-6">
                 <button
                   onClick={() => {
                     setIsCreating(false);
                     setEditing(null);
                   }}
-                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700"
+                  className="px-4 py-2 mr-4 rounded-lg bg-gray-100 text-gray-700"
                 >
                   Cancel
                 </button>

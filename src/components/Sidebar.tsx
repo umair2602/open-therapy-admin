@@ -66,6 +66,7 @@ const navigation: NavigationItem[] = [
     icon: HeartIcon,
   },
   { name: "Content Management", href: "/content", icon: DocumentTextIcon },
+  { name: "Daily Tools", href: "/daily-tools", icon: ShieldExclamationIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
   { name: "Settings", href: "/settings", icon: CogIcon },
   // Example with children:
@@ -92,7 +93,10 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
 
   useEffect(() => {
     const parents = navigation
-      .filter((item) => item.children && item.children.some((c) => c.href === pathname))
+      .filter(
+        (item) =>
+          item.children && item.children.some((c) => c.href === pathname)
+      )
       .map((i) => i.name);
 
     if (parents.length === 0) return;

@@ -18,6 +18,20 @@ export interface EmotionalCategory {
 // Re-export Bloom Global Prompt types
 export * from "./types/BloomGlobalPrompt";
 
+// Daily Tools
+export interface DailyToolItem {
+  name: string;
+  desc?: string;
+  audioUrl?: string;
+}
+
+export interface DailyToolCategory {
+  _id?: string;
+  title: string;
+  icon?: string;
+  tools: DailyToolItem[];
+}
+
 // Crisis Prompt types
 export interface CrisisPromptContentVariants {
   micro: string;

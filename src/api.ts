@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
   EMOTIONAL_CATEGORY: "/emotional_category", // matches app/api/emotionalCategories/route.ts
   CRISIS_PROMPT: "/crisis_prompt",
   SUGGESTED_PROMPTS: "/suggested_prompts",
+  DAILY_TOOLS: "/daily_tools",
 };

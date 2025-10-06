@@ -1,12 +1,15 @@
-'use client'
+"use client";
 
-import { ChartBarIcon, EyeIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline'
+import {
+  ChartBarIcon,
+  EyeIcon,
+  ArrowTrendingUpIcon,
+} from "@heroicons/react/24/outline";
 
 export default function AnalyticsContent() {
-    return (
-        <>
-            {/* Page Header */}
-            <div className="mb-8">
+  return (
+    <>
+      {/* <div className="mb-8">
                 <div className="flex items-center space-x-4">
                     <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl shadow-lg">
                         <ChartBarIcon className="h-8 w-8 text-white" />
@@ -18,7 +21,6 @@ export default function AnalyticsContent() {
                 </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                     <div className="flex items-center">
@@ -68,22 +70,24 @@ export default function AnalyticsContent() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
-            {/* Coming Soon */}
-            <div className="text-center py-16">
-                <div className="mx-auto h-24 w-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-                    <ChartBarIcon className="h-12 w-12 text-indigo-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Analytics Dashboard</h3>
-                <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                    Comprehensive analytics and reporting features are coming soon! You'll get detailed insights into user behavior and platform performance.
-                </p>
-                <div className="inline-flex items-center px-6 py-3 bg-indigo-50 text-indigo-700 rounded-lg">
-                    <div className="animate-pulse mr-2">📊</div>
-                    Coming Soon
-                </div>
-            </div>
-        </>
-    )
+      <div className="text-center py-16">
+        <div className="mx-auto h-24 w-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+          <ChartBarIcon className="h-12 w-12 text-indigo-600" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Analytics Dashboard
+        </h3>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          Comprehensive analytics and reporting features are coming soon! You'll
+          get detailed insights into user behavior and platform performance.
+        </p>
+        <div className="inline-flex items-center px-6 py-3 bg-indigo-50 text-indigo-700 rounded-lg">
+          <div className="animate-pulse mr-2">📊</div>
+          Coming Soon
+        </div>
+      </div>
+    </>
+  );
 }

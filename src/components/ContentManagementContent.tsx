@@ -1,96 +1,105 @@
-'use client'
+"use client";
 
 import {
-    BookOpenIcon,
-    DocumentTextIcon,
-    EyeIcon,
-    FunnelIcon,
-    MagnifyingGlassIcon,
-    PencilIcon,
-    PlusIcon,
-    SpeakerWaveIcon,
-    TrashIcon,
-    VideoCameraIcon
-} from '@heroicons/react/24/outline'
-import { useState } from 'react'
+  BookOpenIcon,
+  ChartBarIcon,
+  DocumentTextIcon,
+  EyeIcon,
+  FunnelIcon,
+  MagnifyingGlassIcon,
+  PencilIcon,
+  PlusIcon,
+  SpeakerWaveIcon,
+  TrashIcon,
+  VideoCameraIcon,
+} from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 export default function ContentManagementContent() {
-    const [activeTab, setActiveTab] = useState('articles')
-    const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState("articles");
+  const [searchQuery, setSearchQuery] = useState("");
 
-    const tabs = [
-        { id: 'articles', name: 'Articles', icon: DocumentTextIcon, count: 24 },
-        { id: 'videos', name: 'Videos', icon: VideoCameraIcon, count: 12 },
-        { id: 'audio', name: 'Audio', icon: SpeakerWaveIcon, count: 8 },
-        { id: 'resources', name: 'Resources', icon: BookOpenIcon, count: 15 },
-    ]
+  const tabs = [
+    { id: "articles", name: "Articles", icon: DocumentTextIcon, count: 24 },
+    { id: "videos", name: "Videos", icon: VideoCameraIcon, count: 12 },
+    { id: "audio", name: "Audio", icon: SpeakerWaveIcon, count: 8 },
+    { id: "resources", name: "Resources", icon: BookOpenIcon, count: 15 },
+  ];
 
-    const sampleContent = [
-        {
-            id: 1,
-            title: "Understanding Anxiety: A Complete Guide",
-            type: "article",
-            status: "published",
-            author: "Dr. Sarah Johnson",
-            createdAt: "2024-01-15",
-            views: 1250,
-            category: "Mental Health"
-        },
-        {
-            id: 2,
-            title: "Mindfulness Meditation Techniques",
-            type: "video",
-            status: "draft",
-            author: "Dr. Michael Chen",
-            createdAt: "2024-01-14",
-            views: 890,
-            category: "Wellness"
-        },
-        {
-            id: 3,
-            title: "Stress Management Audio Guide",
-            type: "audio",
-            status: "published",
-            author: "Dr. Emma Davis",
-            createdAt: "2024-01-13",
-            views: 2100,
-            category: "Stress Relief"
-        },
-        {
-            id: 4,
-            title: "Cognitive Behavioral Therapy Workbook",
-            type: "resource",
-            status: "published",
-            author: "Dr. James Wilson",
-            createdAt: "2024-01-12",
-            views: 3400,
-            category: "Therapy"
-        }
-    ]
+  const sampleContent = [
+    {
+      id: 1,
+      title: "Understanding Anxiety: A Complete Guide",
+      type: "article",
+      status: "published",
+      author: "Dr. Sarah Johnson",
+      createdAt: "2024-01-15",
+      views: 1250,
+      category: "Mental Health",
+    },
+    {
+      id: 2,
+      title: "Mindfulness Meditation Techniques",
+      type: "video",
+      status: "draft",
+      author: "Dr. Michael Chen",
+      createdAt: "2024-01-14",
+      views: 890,
+      category: "Wellness",
+    },
+    {
+      id: 3,
+      title: "Stress Management Audio Guide",
+      type: "audio",
+      status: "published",
+      author: "Dr. Emma Davis",
+      createdAt: "2024-01-13",
+      views: 2100,
+      category: "Stress Relief",
+    },
+    {
+      id: 4,
+      title: "Cognitive Behavioral Therapy Workbook",
+      type: "resource",
+      status: "published",
+      author: "Dr. James Wilson",
+      createdAt: "2024-01-12",
+      views: 3400,
+      category: "Therapy",
+    },
+  ];
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'published': return 'bg-green-100 text-green-800'
-            case 'draft': return 'bg-yellow-100 text-yellow-800'
-            case 'archived': return 'bg-gray-100 text-gray-800'
-            default: return 'bg-gray-100 text-gray-800'
-        }
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "published":
+        return "bg-green-100 text-green-800";
+      case "draft":
+        return "bg-yellow-100 text-yellow-800";
+      case "archived":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
+  };
 
-    const getTypeIcon = (type: string) => {
-        switch (type) {
-            case 'article': return DocumentTextIcon
-            case 'video': return VideoCameraIcon
-            case 'audio': return SpeakerWaveIcon
-            case 'resource': return BookOpenIcon
-            default: return DocumentTextIcon
-        }
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "article":
+        return DocumentTextIcon;
+      case "video":
+        return VideoCameraIcon;
+      case "audio":
+        return SpeakerWaveIcon;
+      case "resource":
+        return BookOpenIcon;
+      default:
+        return DocumentTextIcon;
     }
+  };
 
-    return (
-        <>
-            {/* Page Header */}
-            <div className="mb-8">
+  return (
+    <>
+      {/* <div className="mb-8">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg">
@@ -108,7 +117,6 @@ export default function ContentManagementContent() {
                 </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 {tabs.map((tab) => {
                     const Icon = tab.icon
@@ -128,7 +136,6 @@ export default function ContentManagementContent() {
                 })}
             </div>
 
-            {/* Content Tabs */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 mb-8">
                 <div className="border-b border-gray-200">
                     <nav className="flex space-x-8 px-6" aria-label="Tabs">
@@ -155,7 +162,6 @@ export default function ContentManagementContent() {
                     </nav>
                 </div>
 
-                {/* Search and Filters */}
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
@@ -193,7 +199,6 @@ export default function ContentManagementContent() {
                     </div>
                 </div>
 
-                {/* Content List */}
                 <div className="p-6">
                     <div className="space-y-4">
                         {sampleContent.map((content) => {
@@ -235,7 +240,6 @@ export default function ContentManagementContent() {
                         })}
                     </div>
 
-                    {/* Pagination */}
                     <div className="mt-6 flex items-center justify-between">
                         <p className="text-sm text-gray-700">
                             Showing <span className="font-medium">1</span> to <span className="font-medium">4</span> of{' '}
@@ -260,7 +264,24 @@ export default function ContentManagementContent() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </>
-    )
+            </div> */}
+
+      <div className="text-center py-16">
+        <div className="mx-auto h-24 w-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+          <ChartBarIcon className="h-12 w-12 text-indigo-600" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Content Dashboard
+        </h3>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          Comprehensive analytics and reporting features are coming soon! You'll
+          get detailed insights into user behavior and platform performance.
+        </p>
+        <div className="inline-flex items-center px-6 py-3 bg-indigo-50 text-indigo-700 rounded-lg">
+          <div className="animate-pulse mr-2">📊</div>
+          Coming Soon
+        </div>
+      </div>
+    </>
+  );
 }

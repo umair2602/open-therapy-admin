@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const bodyBuffer = Buffer.from(arrayBuffer);
 
     const safeName = file.name.replace(/\s+/g, "_");
-    const key = `uploads/${Date.now()}-${Math.random()
+    const key = `book-images/${Date.now()}-${Math.random()
       .toString(36)
       .slice(2)}-${safeName}`;
 
@@ -40,23 +40,21 @@ export async function POST(req: NextRequest) {
         secretAccessKey: getRequiredEnv("AWS_SECRET_KEY"),
       },
     });
+
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
       Body: bodyBuffer,
       ContentType: file.type || "application/octet-stream",
-    });
+      ACL: "public-read",
+    } as any);
 
     await s3.send(command);
 
-    const publicBase = process.env.AWS_S3_PUBLIC_BASE_URL;
-    const publicUrl = publicBase
-      ? `${publicBase}/${key}`
-      : `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
-
+    const publicUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
     return NextResponse.json({ url: publicUrl }, { status: 201 });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Book image upload error:", error);
     return NextResponse.json(
       { message: "File upload failed" },
       { status: 500 }

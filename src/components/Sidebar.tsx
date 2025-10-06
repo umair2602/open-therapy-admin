@@ -66,6 +66,7 @@ const navigation: NavigationItem[] = [
     icon: HeartIcon,
   },
   { name: "Content Management", href: "/content", icon: DocumentTextIcon },
+  { name: "Books", href: "/books", icon: DocumentTextIcon },
   { name: "Daily Tools", href: "/daily-tools", icon: ShieldExclamationIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
   { name: "Settings", href: "/settings", icon: CogIcon },

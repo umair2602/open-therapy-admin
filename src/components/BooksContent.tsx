@@ -10,18 +10,27 @@ type DraftBook = {
   title: string;
   description: string;
   imageURL?: string;
+  pdfURL?: string;
   author: string;
 };
 
 export default function BooksContent() {
-  const { books, isFetching, createBook, updateBook, deleteBook, uploadImage } =
-    useBooks();
+  const {
+    books,
+    isFetching,
+    createBook,
+    updateBook,
+    deleteBook,
+    uploadImage,
+    uploadPdf,
+  } = useBooks();
   const [modalOpen, setModalOpen] = useState(false);
   const [draft, setDraft] = useState<DraftBook>({
     category: "",
     title: "",
     description: "",
     imageURL: "",
+    pdfURL: "",
     author: "",
   });
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -33,6 +42,7 @@ export default function BooksContent() {
       title: "",
       description: "",
       imageURL: "",
+      pdfURL: "",
       author: "",
     });
   };
@@ -49,6 +59,8 @@ export default function BooksContent() {
 
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const handleImageFile = async (file: File) => {
     setImageError(null);
     const objectUrl = URL.createObjectURL(file);
@@ -64,8 +76,8 @@ export default function BooksContent() {
 
       const width = loaded.width;
       const height = loaded.height;
-      const isAllowed =
-        (width === 72 && height === 72) || (width === 191 && height === 275);
+      const isAllowed = true;
+      // (width === 72 && height === 72) || (width === 191 && height === 275);
 
       if (!isAllowed) {
         setImageError(
@@ -82,6 +94,23 @@ export default function BooksContent() {
     } finally {
       URL.revokeObjectURL(objectUrl);
       setUploading(false);
+    }
+  };
+
+  const handlePdfFile = async (file: File) => {
+    setPdfError(null);
+    if (file.type !== "application/pdf") {
+      setPdfError("Only PDF files are allowed.");
+      return;
+    }
+    try {
+      setPdfUploading(true);
+      const url = await uploadPdf(file);
+      setDraft((d) => ({ ...d, pdfURL: url }));
+    } catch (err: any) {
+      setPdfError(err?.message || "PDF upload failed");
+    } finally {
+      setPdfUploading(false);
     }
   };
 
@@ -167,6 +196,7 @@ export default function BooksContent() {
                           title: b.title,
                           description: b.description,
                           imageURL: b.imageURL,
+                          pdfURL: (b as any).pdfURL,
                           author: b.author,
                         });
                         setModalOpen(true);
@@ -298,6 +328,39 @@ export default function BooksContent() {
                         alt="preview"
                         className="h-16 w-16 object-cover rounded"
                       />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Content (PDF only)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handlePdfFile(f);
+                      }}
+                      className="block w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-lg border-gray-300"
+                    />
+                    {pdfUploading && (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+                    )}
+                  </div>
+                  {pdfError && (
+                    <p className="mt-1 text-xs text-red-600">{pdfError}</p>
+                  )}
+                  {draft.pdfURL && (
+                    <div className="mt-2">
+                      <a
+                        href={draft.pdfURL}
+                        target="_blank"
+                        className="text-blue-600 underline"
+                      >
+                        View uploaded PDF
+                      </a>
                     </div>
                   )}
                 </div>

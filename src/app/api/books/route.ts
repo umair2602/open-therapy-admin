@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const body = await req.json();
+    // Optional: enforce that if pdfURL is provided, it looks like a URL
+    if (body?.pdfURL && typeof body.pdfURL !== "string") {
+      return NextResponse.json({ message: "Invalid pdfURL" }, { status: 400 });
+    }
     const created = await Book.create(body);
     return NextResponse.json(created, { status: 201 });
   } catch (error) {

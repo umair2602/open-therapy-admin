@@ -5,6 +5,7 @@ export interface BookDocument extends Document {
   title: string;
   description: string;
   imageURL?: string;
+  pdfURL?: string;
   author: string;
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +17,7 @@ const BookSchema = new Schema<BookDocument>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     imageURL: { type: String },
+    pdfURL: { type: String },
     author: { type: String, required: true },
   },
   { timestamps: true }

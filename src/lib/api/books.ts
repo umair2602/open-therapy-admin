@@ -7,6 +7,7 @@ export interface Book {
   title: string;
   description: string;
   imageURL?: string;
+  pdfURL?: string;
   author: string;
 }
 
@@ -36,6 +37,15 @@ export const uploadBookImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
   const res = await api.post(`${API_ENDPOINTS.BOOKS}/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data.url as string;
+};
+
+export const uploadBookPdf = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await api.post(`${API_ENDPOINTS.BOOKS}/upload-pdf`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data.url as string;

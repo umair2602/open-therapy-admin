@@ -22,10 +22,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // If an explicit type guard is desired for images only, ensure it starts with image/
-    if (file.type && !file.type.startsWith("image/")) {
+    // Validate MIME for PDF only
+    const contentType = file.type || "";
+    if (contentType !== "application/pdf") {
       return NextResponse.json(
-        { message: "Invalid file type. Only images are allowed" },
+        { message: "Invalid file type. Only PDF is allowed" },
         { status: 400 }
       );
     }
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
     const bodyBuffer = Buffer.from(arrayBuffer);
 
     const safeName = file.name.replace(/\s+/g, "_");
-    const key = `book-images/${Date.now()}-${Math.random()
+    const key = `book-pdfs/${Date.now()}-${Math.random()
       .toString(36)
       .slice(2)}-${safeName}`;
 
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
       Bucket: bucket,
       Key: key,
       Body: bodyBuffer,
-      ContentType: file.type || "application/octet-stream",
+      ContentType: "application/pdf",
       ACL: "public-read",
     } as any);
 
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     const publicUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
     return NextResponse.json({ url: publicUrl }, { status: 201 });
   } catch (error) {
-    console.error("Book image upload error:", error);
+    console.error("Book PDF upload error:", error);
     return NextResponse.json(
       { message: "File upload failed" },
       { status: 500 }

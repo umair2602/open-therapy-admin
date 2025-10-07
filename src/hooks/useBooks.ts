@@ -6,6 +6,7 @@ import {
   updateBook,
   Book,
   uploadBookImage,
+  uploadBookPdf,
 } from "@/lib/api/books";
 
 export const useBooks = () => {
@@ -44,6 +45,7 @@ export const useBooks = () => {
     updateBook: updateMutation.mutateAsync,
     deleteBook: deleteMutation.mutateAsync,
     uploadImage: uploadBookImage,
+    uploadPdf: uploadBookPdf,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,

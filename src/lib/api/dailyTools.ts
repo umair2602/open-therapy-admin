@@ -35,3 +35,17 @@ export const uploadDailyToolAudio = async (file: File): Promise<string> => {
   });
   return res.data.url as string;
 };
+
+export const uploadDailyToolIcon = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await api.post(
+    `${API_ENDPOINTS.DAILY_TOOLS}/upload-icon`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  return res.data.url as string;
+};

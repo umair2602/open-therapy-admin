@@ -19,6 +19,7 @@ export default function DailyToolsContent() {
     updateCategory,
     deleteCategory,
     uploadAudio,
+    uploadIcon,
     refetch,
     isCreating,
     isUpdating,
@@ -33,6 +34,7 @@ export default function DailyToolsContent() {
     tools: [],
   });
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [uploadingIcon, setUploadingIcon] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const resetDraft = () => setDraft({ title: "", icon: "", tools: [] });
@@ -61,6 +63,16 @@ export default function DailyToolsContent() {
       });
     } finally {
       setUploadingIndex(null);
+    }
+  };
+
+  const handleUploadIcon = async (file: File) => {
+    setUploadingIcon(true);
+    try {
+      const url = await uploadIcon(file);
+      setDraft((d) => ({ ...d, icon: url }));
+    } finally {
+      setUploadingIcon(false);
     }
   };
 
@@ -150,15 +162,46 @@ export default function DailyToolsContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Icon key (optional)
+                    Category Icon (optional)
                   </label>
-                  <input
-                    value={draft.icon || ""}
-                    onChange={(e) =>
-                      setDraft({ ...draft, icon: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                  />
+                  <div className="space-y-3">
+                    {draft.icon && (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={draft.icon}
+                          alt="Category icon"
+                          className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-600">Current icon</p>
+                          <button
+                            type="button"
+                            onClick={() => setDraft({ ...draft, icon: "" })}
+                            className="text-xs text-red-600 hover:text-red-800"
+                          >
+                            Remove icon
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadIcon(file);
+                        }}
+                        className="block w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-lg border-gray-300"
+                      />
+                      {uploadingIcon && (
+                        <span className="inline-flex items-center gap-2 text-xs text-gray-600">
+                          <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+                          Uploading...
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="mt-4">
@@ -269,13 +312,22 @@ export default function DailyToolsContent() {
             className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
           >
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {category.title}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {category.tools.length} tools
-                </p>
+              <div className="flex items-center gap-4">
+                {category.icon && (
+                  <img
+                    src={category.icon}
+                    alt={`${category.title} icon`}
+                    className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                  />
+                )}
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {category.title}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {category.tools.length} tools
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button

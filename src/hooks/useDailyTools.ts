@@ -5,6 +5,7 @@ import {
   updateDailyToolCategory,
   deleteDailyToolCategory,
   uploadDailyToolAudio,
+  uploadDailyToolIcon,
 } from "@/lib/api/dailyTools";
 import { DailyToolCategory } from "@/types";
 
@@ -46,6 +47,7 @@ export const useDailyTools = () => {
   });
 
   const uploadAudio = async (file: File) => uploadDailyToolAudio(file);
+  const uploadIcon = async (file: File) => uploadDailyToolIcon(file);
 
   return {
     categories,
@@ -56,6 +58,7 @@ export const useDailyTools = () => {
     updateCategory: updateMutation.mutateAsync,
     deleteCategory: deleteMutation.mutateAsync,
     uploadAudio,
+    uploadIcon,
 
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,

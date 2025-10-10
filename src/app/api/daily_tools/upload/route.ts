@@ -36,8 +36,8 @@ export async function POST(req: NextRequest) {
     const s3 = new S3Client({
       region,
       credentials: {
-        accessKeyId: getRequiredEnv("AWS_ACCESS_KEY"),
-        secretAccessKey: getRequiredEnv("AWS_SECRET_KEY"),
+        accessKeyId: getRequiredEnv("AWS_ACCESS_KEY_OT"),
+        secretAccessKey: getRequiredEnv("AWS_SECRET_KEY_OT"),
       },
     });
     const command = new PutObjectCommand({

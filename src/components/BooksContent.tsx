@@ -12,7 +12,36 @@ type DraftBook = {
   imageURL?: string;
   pdfURL?: string;
   author: string;
+  emotionalProfile?: string[];
+  directionTags?: string[];
+  lifeAreas?: string[];
 };
+
+const supportedAreas = [
+  "work",
+  "relationships",
+  "health",
+  "family",
+  "personal_growth",
+  "love",
+  "friendship",
+  "studies",
+  "finances",
+  "self-care",
+  "physical_wellbeing",
+  "mental_wellbeing",
+  "self_knowledge",
+  "purpose",
+  "spirituality_intuition",
+  "self_esteem",
+];
+
+const directionTags = [
+  "tensa e agitada",
+  "animada e confiante",
+  "desanimada e apática",
+  "calma e leve",
+];
 
 export default function BooksContent() {
   const {
@@ -32,6 +61,9 @@ export default function BooksContent() {
     imageURL: "",
     pdfURL: "",
     author: "",
+    emotionalProfile: [],
+    directionTags: [],
+    lifeAreas: [],
   });
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -44,10 +76,14 @@ export default function BooksContent() {
       imageURL: "",
       pdfURL: "",
       author: "",
+      emotionalProfile: [],
+      directionTags: [],
+      lifeAreas: [],
     });
   };
 
   const onSave = async () => {
+    console.log("Draft", draft);
     if (!draft.title || !draft.category || !draft.author) return;
     if (draft._id) {
       await updateBook({ id: draft._id, data: draft });
@@ -377,6 +413,120 @@ export default function BooksContent() {
                   rows={8}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Emotional Profile
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {["PE01", "PE02", "PE03", "PE04", "PE05", "PE06"].map(
+                    (code) => {
+                      const selected = draft.emotionalProfile?.includes(code);
+                      return (
+                        <button
+                          key={code}
+                          type="button"
+                          onClick={() => {
+                            setDraft((d) => {
+                              const selected = d.emotionalProfile || [];
+                              return selected.includes(code)
+                                ? {
+                                    ...d,
+                                    emotionalProfile: selected.filter(
+                                      (c) => c !== code
+                                    ),
+                                  }
+                                : {
+                                    ...d,
+                                    emotionalProfile: [...selected, code],
+                                  };
+                            });
+                          }}
+                          className={`px-3 py-1 rounded-lg border text-sm font-medium transition ${
+                            selected
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                          }`}
+                        >
+                          {code}
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+              {/* Direction Tags */}
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Direction Tags
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {directionTags.map((tag) => {
+                    const selected = draft.directionTags?.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setDraft((d) => {
+                            const selected = d.directionTags || [];
+                            return selected.includes(tag)
+                              ? {
+                                  ...d,
+                                  directionTags: selected.filter(
+                                    (t) => t !== tag
+                                  ),
+                                }
+                              : { ...d, directionTags: [...selected, tag] };
+                          });
+                        }}
+                        className={`px-3 py-1 rounded-lg border text-sm font-medium transition ${
+                          selected
+                            ? "bg-green-600 text-white border-green-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Life Areas */}
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Life Areas
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {supportedAreas.map((area) => {
+                    const selected = draft.lifeAreas?.includes(area);
+                    return (
+                      <button
+                        key={area}
+                        type="button"
+                        onClick={() => {
+                          setDraft((d) => {
+                            const selected = d.lifeAreas || [];
+                            return selected.includes(area)
+                              ? {
+                                  ...d,
+                                  lifeAreas: selected.filter((a) => a !== area),
+                                }
+                              : { ...d, lifeAreas: [...selected, area] };
+                          });
+                        }}
+                        className={`px-3 py-1 rounded-lg border text-sm font-medium transition ${
+                          selected
+                            ? "bg-purple-600 text-white border-purple-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                        }`}
+                      >
+                        {area}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="mt-6 flex gap-3 justify-end">
                 <button

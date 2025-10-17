@@ -157,7 +157,7 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                                     <p className="text-sm font-medium text-gray-900">Admin User</p>
                                     <p className="text-xs text-gray-500">admin@opentherapy.com</p>
                                 </div>
-                                <Menu.Item>
+                                {/* <Menu.Item>
                                     {({ active }) => (
                                         <a
                                             href="#"
@@ -180,8 +180,8 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                                             Settings
                                         </a>
                                     )}
-                                </Menu.Item>
-                                <div className="border-t border-gray-200 my-1"></div>
+                                </Menu.Item> */}
+                                {/* <div className="border-t border-gray-200 my-1"></div> */}
                                 <Menu.Item>
                                     {({ active }) => (
                                         <button

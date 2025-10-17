@@ -37,10 +37,11 @@ const supportedAreas = [
 ];
 
 const directionTags = [
-  "tensa e agitada",
-  "animada e confiante",
-  "desanimada e apática",
-  "calma e leve",
+  "calm_down",
+  "breathe",
+  "anchor_present",
+  "grounding",
+  "self_compassion"
 ];
 
 export default function BooksContent() {
@@ -84,7 +85,7 @@ export default function BooksContent() {
 
   const onSave = async () => {
     console.log("Draft", draft);
-    if (!draft.title || !draft.category || !draft.author) return;
+    if (!draft.title || !draft.category || !draft.author || !draft.imageURL || !draft.pdfURL) return;
     if (draft._id) {
       await updateBook({ id: draft._id, data: draft });
     } else {
@@ -234,6 +235,9 @@ export default function BooksContent() {
                           imageURL: b.imageURL,
                           pdfURL: (b as any).pdfURL,
                           author: b.author,
+                          emotionalProfile: (b as any).emotionalProfile || [],
+                          directionTags: (b as any).directionTags || [],
+                          lifeAreas: (b as any).lifeAreas || [],
                         });
                         setModalOpen(true);
                       }}
@@ -537,7 +541,8 @@ export default function BooksContent() {
                 </button>
                 <button
                   onClick={onSave}
-                  className="px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700"
+                  disabled={!draft.title || !draft.category || !draft.author || !draft.imageURL || !draft.pdfURL}
+                  className="px-4 py-2 rounded-lg disabled:bg-gray-400 text-white bg-blue-600 hover:bg-blue-700"
                 >
                   Save
                 </button>

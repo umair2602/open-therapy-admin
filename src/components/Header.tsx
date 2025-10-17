@@ -53,7 +53,7 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
             {/* Main header content */}
             <div className="flex flex-1 items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Search - Hidden on mobile, visible on tablet+ */}
-                <div className="hidden md:flex flex-1 max-w-lg">
+                {/* <div className="hidden md:flex flex-1 max-w-lg">
                     <div className="relative w-full">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -66,12 +66,12 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                             className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 text-sm"
                         />
                     </div>
-                </div>
+                </div> */}
 
                 {/* Right side actions */}
-                <div className="flex items-center gap-x-2 sm:gap-x-4">
+                <div className="ml-auto flex items-center gap-x-2 sm:gap-x-4">
                     {/* Dark mode toggle */}
-                    <button
+                    {/* <button
                         onClick={toggleTheme}
                         className="p-2 text-gray-400 hover:text-gray-500 transition-colors"
                     >
@@ -80,10 +80,10 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                         ) : (
                             <SunIcon className="h-5 w-5" />
                         )}
-                    </button>
+                    </button> */}
 
                     {/* Notifications */}
-                    <Menu as="div" className="relative">
+                    {/* <Menu as="div" className="relative">
                         <Menu.Button className="p-2 text-gray-400 hover:text-gray-500 relative">
                             <span className="sr-only">View notifications</span>
                             <BellIcon className="h-5 w-5" aria-hidden="true" />
@@ -125,7 +125,7 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                                 </div>
                             </Menu.Items>
                         </Transition>
-                    </Menu>
+                    </Menu> */}
 
                     {/* Separator - Hidden on mobile */}
                     <div className="hidden sm:block h-6 w-px bg-gray-200" aria-hidden="true" />

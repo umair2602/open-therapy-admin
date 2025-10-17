@@ -21,6 +21,22 @@ export default function SettingsContent() {
         { id: 'system', name: 'System', icon: ServerIcon },
     ]
 
+    return <div className="text-center py-16">
+        <div className="mx-auto h-24 w-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <CogIcon className="h-12 w-12 text-blue-600" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Settings
+        </h3>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          This feature is coming soon!
+        </p>
+        <div className="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-lg">
+          <div className="animate-pulse mr-2">🚀</div>
+          Coming Soon
+        </div>
+      </div>
+
     return (
         <>
             {/* Page Header */}

@@ -31,7 +31,7 @@ export default function DashboardContent() {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {/* <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center">
                         <div className="p-3 bg-blue-100 rounded-xl">
                             <UsersIcon className="h-6 w-6 text-blue-600" />
@@ -55,7 +55,7 @@ export default function DashboardContent() {
                             <p className="text-xs text-green-600">+8% from last month</p>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center">
@@ -87,8 +87,7 @@ export default function DashboardContent() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                {/* Recent Activity */}
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
                     <div className="p-6 border-b border-gray-100">
                         <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
@@ -127,7 +126,6 @@ export default function DashboardContent() {
                     </div>
                 </div>
 
-                {/* Quick Actions */}
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
                     <div className="p-6 border-b border-gray-100">
                         <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
@@ -185,7 +183,7 @@ export default function DashboardContent() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </>
     )
 }

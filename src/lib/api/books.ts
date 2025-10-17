@@ -9,6 +9,9 @@ export interface Book {
   imageURL?: string;
   pdfURL?: string;
   author: string;
+  emotionalProfile?: string[];
+  directionTags?: string[];
+  lifeAreas?: string[]; 
 }
 
 export const getBooks = async (): Promise<Book[]> => {

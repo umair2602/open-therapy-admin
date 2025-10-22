@@ -447,7 +447,7 @@ export default function EmotionalCategoriesContent() {
               {selectedEmotion.directionTags &&
               selectedEmotion.directionTags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {selectedEmotion.directionTags.map((tag, index) => (
+                  {selectedEmotion.directionTags.map((tag: any, index: any) => (
                     <div
                       key={index}
                       className="group flex items-center px-3 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg hover:shadow-md transition-all"

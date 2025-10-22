@@ -1,11 +1,12 @@
 import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 import { Emotion, EmotionalCategory } from "@/types";
 import {
-  PlusIcon,
-  SparklesIcon,
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+  Plus,
+  Sparkles,
+  Trash2,
+  X,
+  Tag,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface UpdateCategoryProps {
@@ -28,11 +29,62 @@ export default function UpdateCategory({
     name: "",
     prompt: "",
     points: undefined,
+    directionTags: [],
   });
+  const [newTag, setNewTag] = useState("");
+  const [editingTagForEmotion, setEditingTagForEmotion] = useState<number | null>(null);
+  const [editingNewTag, setEditingNewTag] = useState("");
 
   useEffect(() => {
     setCategory(initialData);
   }, [initialData]);
+
+  const handleAddTag = () => {
+    if (!newTag.trim()) return;
+    setNewEmotion({
+      ...newEmotion,
+      directionTags: [...(newEmotion.directionTags || []), newTag.trim()],
+    });
+    setNewTag("");
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setNewEmotion({
+      ...newEmotion,
+      directionTags: (newEmotion.directionTags || []).filter((_, i) => i !== index),
+    });
+  };
+
+  const handleAddTagToExistingEmotion = (emotionIndex: number) => {
+    if (!editingNewTag.trim()) return;
+    const updatedEmotions = [...category.emotions];
+    updatedEmotions[emotionIndex] = {
+      ...updatedEmotions[emotionIndex],
+      directionTags: [
+        ...(updatedEmotions[emotionIndex].directionTags || []),
+        editingNewTag.trim(),
+      ],
+    };
+    setCategory({
+      ...category,
+      emotions: updatedEmotions,
+    });
+    setEditingNewTag("");
+  };
+
+  const handleRemoveTagFromExistingEmotion = (emotionIndex: number, tagIndex: number) => {
+    const updatedEmotions = [...category.emotions];
+    updatedEmotions[emotionIndex] = {
+      ...updatedEmotions[emotionIndex],
+      directionTags: (updatedEmotions[emotionIndex].directionTags || []).filter(
+        (_, i) => i !== tagIndex
+      ),
+    };
+    setCategory({
+      ...category,
+      emotions: updatedEmotions,
+    });
+  };
 
   const handleAddEmotion = () => {
     if (!newEmotion.name.trim()) return;
@@ -40,7 +92,7 @@ export default function UpdateCategory({
       ...category,
       emotions: [...category.emotions, { ...newEmotion }],
     });
-    setNewEmotion({ name: "", prompt: "" });
+    setNewEmotion({ name: "", prompt: "", directionTags: [] });
   };
 
   const handleDeleteEmotion = (index: number) => {
@@ -65,7 +117,7 @@ export default function UpdateCategory({
 
   const handleSubmit = async () => {
     updateCategory({
-      id: category?._id as string, // make sure your schema uses `_id`
+      id: category?._id as string,
       data: category,
     }).then((c) => {
       onUpdated(c);
@@ -84,7 +136,7 @@ export default function UpdateCategory({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                  <SparklesIcon className="h-6 w-6 text-white" />
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">
@@ -99,7 +151,7 @@ export default function UpdateCategory({
                 onClick={onClose}
                 className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
               >
-                <XMarkIcon className="h-6 w-6" />
+                <X className="h-6 w-6" />
               </button>
             </div>
           </div>
@@ -237,22 +289,6 @@ export default function UpdateCategory({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Emotion Prompt for AI
-                    </label>
-                    <textarea
-                      placeholder="Describe what this emotion represents and how it manifests in daily life..."
-                      value={newEmotion.prompt || ""}
-                      onChange={(e) =>
-                        setNewEmotion({ ...newEmotion, prompt: e.target.value })
-                      }
-                      rows={2}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors resize-none"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Emotion Points (optional)
                     </label>
                     <input
@@ -270,12 +306,74 @@ export default function UpdateCategory({
                     />
                   </div>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Emotion Prompt for AI
+                  </label>
+                  <textarea
+                    placeholder="Describe what this emotion represents and how it manifests in daily life..."
+                    value={newEmotion.prompt || ""}
+                    onChange={(e) =>
+                      setNewEmotion({ ...newEmotion, prompt: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors resize-none"
+                  />
+                </div>
+
+                {/* Direction Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Direction Tags
+                  </label>
+                  <div className="flex space-x-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="e.g., energizing, grounding, isolating"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    />
+                    <button
+                      onClick={handleAddTag}
+                      disabled={!newTag.trim()}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Tag className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {newEmotion.directionTags && newEmotion.directionTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {newEmotion.directionTags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg text-sm text-purple-700"
+                        >
+                          {tag}
+                          <button
+                            onClick={() => handleRemoveTag(index)}
+                            className="ml-2 text-purple-400 hover:text-purple-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={handleAddEmotion}
                   disabled={!newEmotion.name.trim()}
                   className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  <PlusIcon className="h-5 w-5 mr-2" />
+                  <Plus className="h-5 w-5 mr-2" />
                   Add Emotion
                 </button>
               </div>
@@ -288,7 +386,7 @@ export default function UpdateCategory({
                   <div className="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
                   Existing Emotions ({category.emotions.length})
                 </h4>
-                <div className="space-y-4 max-h-64 overflow-y-auto">
+                <div className="space-y-4 max-h-96 overflow-y-auto">
                   {category.emotions.map((emotion, index) => (
                     <div
                       key={index}
@@ -326,15 +424,6 @@ export default function UpdateCategory({
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                           />
                         </div>
-                        <div className="flex items-end">
-                          <button
-                            onClick={() => handleDeleteEmotion(index)}
-                            className="w-full px-4 py-2 text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors flex items-center justify-center"
-                          >
-                            <TrashIcon className="h-4 w-4 mr-2" />
-                            Remove
-                          </button>
-                        </div>
                       </div>
                       <div className="mt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -349,6 +438,68 @@ export default function UpdateCategory({
                           rows={2}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors resize-none"
                         />
+                      </div>
+
+                      {/* Direction Tags for existing emotion */}
+                      <div className="mt-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Direction Tags
+                        </label>
+                        <div className="flex space-x-2 mb-2">
+                          <input
+                            type="text"
+                            placeholder="Add a direction tag..."
+                            value={editingTagForEmotion === index ? editingNewTag : ""}
+                            onFocus={() => setEditingTagForEmotion(index)}
+                            onChange={(e) => setEditingNewTag(e.target.value)}
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleAddTagToExistingEmotion(index);
+                              }
+                            }}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm"
+                          />
+                          <button
+                            onClick={() => handleAddTagToExistingEmotion(index)}
+                            disabled={editingTagForEmotion !== index || !editingNewTag.trim()}
+                            className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Tag className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {emotion.directionTags && emotion.directionTags.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {emotion.directionTags.map((tag, tagIndex) => (
+                              <span
+                                key={tagIndex}
+                                className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg text-xs text-purple-700"
+                              >
+                                {tag}
+                                <button
+                                  onClick={() =>
+                                    handleRemoveTagFromExistingEmotion(index, tagIndex)
+                                  }
+                                  className="ml-2 text-purple-400 hover:text-purple-600"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-500 italic">No tags yet</p>
+                        )}
+                      </div>
+
+                      <div className="mt-3">
+                        <button
+                          onClick={() => handleDeleteEmotion(index)}
+                          className="w-full px-4 py-2 text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors flex items-center justify-center"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Remove Emotion
+                        </button>
                       </div>
                     </div>
                   ))}

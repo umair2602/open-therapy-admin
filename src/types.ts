@@ -2,6 +2,7 @@ export interface Emotion {
   name: string;
   prompt?: string;
   points?: number;
+  directionTags?: string[]
 }
 
 export interface EmotionalCategory {

@@ -1,49 +1,142 @@
 'use client'
 
-import {
-    BellIcon,
-    CloudIcon,
-    CogIcon,
-    ServerIcon,
-    ShieldCheckIcon,
-    UserIcon
-} from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { showErrorToast, showSuccessToast } from '@/lib/utils';
+import { Settings, User, Eye, EyeOff, Check } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Toaster, toast } from 'sonner';
 
 export default function SettingsContent() {
     const [activeTab, setActiveTab] = useState('general')
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    
+    const [profileData, setProfileData] = useState({
+        username: '',
+        email: '',
+        role: ''
+    })
+    
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    })
+    
+    const [loading, setLoading] = useState(false)
+    const [loadingProfile, setLoadingProfile] = useState(true)
+    const [message, setMessage] = useState({ type: '', text: '' })
+
+    // Fetch admin profile on component mount
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch('/api/admin/profile')
+                const data = await response.json()
+                
+                if (response.ok && data.user) {
+                    setProfileData({
+                        username: data.user.username,
+                        email: data.user.email,
+                        role: data.user.role
+                    })
+                }
+            } catch (error) {
+                console.error('Failed to fetch profile:', error)
+            } finally {
+                setLoadingProfile(false)
+            }
+        }
+        
+        fetchProfile()
+    }, [])
 
     const tabs = [
-        { id: 'general', name: 'General', icon: CogIcon },
-        { id: 'notifications', name: 'Notifications', icon: BellIcon },
-        { id: 'security', name: 'Security', icon: ShieldCheckIcon },
-        { id: 'profile', name: 'Profile', icon: UserIcon },
-        { id: 'system', name: 'System', icon: ServerIcon },
+        { id: 'general', name: 'General', icon: Settings },
+        { id: 'profile', name: 'Profile', icon: User },
     ]
 
-    return <div className="text-center py-16">
-        <div className="mx-auto h-24 w-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-          <CogIcon className="h-12 w-12 text-blue-600" />
-        </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Settings
-        </h3>
-        <p className="text-gray-600 mb-8 max-w-md mx-auto">
-          This feature is coming soon!
-        </p>
-        <div className="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-lg">
-          <div className="animate-pulse mr-2">🚀</div>
-          Coming Soon
-        </div>
-      </div>
+    const handleProfileUpdate = async () => {
+        setLoading(true)
+        setMessage({ type: '', text: '' })
+        
+        try {
+            const response = await fetch('/api/admin/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: profileData.username,
+                    email: profileData.email
+                })
+            })
+            
+            const data = await response.json()
+            
+            if (response.ok) {
+                setMessage({ type: 'success', text: 'Profile updated successfully!' })
+                showSuccessToast('Profile Updated Successfully!')
+            } else {
+                showErrorToast('Failed to update profile')
+                setMessage({ type: 'error', text: data.message || 'Failed to update profile' })
+            }
+        } catch (error) {
+            showErrorToast('An error occurred. Please try again.');
+            setMessage({ type: 'error', text: 'An error occurred. Please try again.' })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handlePasswordUpdate = async () => {
+        setLoading(true)
+        setMessage({ type: '', text: '' })
+        
+        if (passwordData.newPassword.length < 6) {
+            setMessage({ type: 'error', text: 'Password must be at least 6 characters long' })
+            setLoading(false)
+            return
+        }
+        
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage({ type: 'error', text: 'Passwords do not match' })
+            setLoading(false)
+            return
+        }
+        
+        try {
+            const response = await fetch('/api/admin/change-password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            })
+            
+            const data = await response.json()
+            
+            if (response.ok) {
+                showSuccessToast('Password changed successfully!')
+                setMessage({ type: 'success', text: 'Password changed successfully!' })
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+            } else {
+                showErrorToast('Failed to change password')
+                setMessage({ type: 'error', text: data.message || 'Failed to change password' })
+            }
+        } catch (error) {
+            showErrorToast('An error occurred. Please try again.')
+            setMessage({ type: 'error', text: 'An error occurred. Please try again.' })
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <>
-            {/* Page Header */}
             <div className="mb-8">
                 <div className="flex items-center space-x-4">
                     <div className="p-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl shadow-lg">
-                        <CogIcon className="h-8 w-8 text-white" />
+                        <Settings className="h-8 w-8 text-white" />
                     </div>
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
@@ -53,7 +146,6 @@ export default function SettingsContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Settings Navigation */}
                 <div className="lg:col-span-1">
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Settings</h3>
@@ -61,11 +153,15 @@ export default function SettingsContent() {
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === tab.id
-                                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                        : 'text-gray-600 hover:bg-gray-50'
-                                        }`}
+                                    onClick={() => {
+                                        setActiveTab(tab.id)
+                                        setMessage({ type: '', text: '' })
+                                    }}
+                                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                                        activeTab === tab.id
+                                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
                                 >
                                     <tab.icon className="h-5 w-5" />
                                     <span className="text-sm font-medium">{tab.name}</span>
@@ -75,9 +171,18 @@ export default function SettingsContent() {
                     </div>
                 </div>
 
-                {/* Settings Content */}
                 <div className="lg:col-span-3">
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+                        {message.text && (
+                            <div className={`mb-6 p-4 rounded-lg ${
+                                message.type === 'success' 
+                                    ? 'bg-green-50 text-green-800 border border-green-200' 
+                                    : 'bg-red-50 text-red-800 border border-red-200'
+                            }`}>
+                                {message.text}
+                            </div>
+                        )}
+
                         {activeTab === 'general' && (
                             <div>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-6">General Settings</h2>
@@ -114,84 +219,15 @@ export default function SettingsContent() {
                                             <option>UTC+1 (Central European)</option>
                                         </select>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">Maintenance Mode</h3>
-                                            <p className="text-sm text-gray-500">Enable maintenance mode to restrict access</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'notifications' && (
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-6">Notification Settings</h2>
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">Email Notifications</h3>
-                                            <p className="text-sm text-gray-500">Receive notifications via email</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
+                                
+                                <div className="mt-8 pt-6 border-t border-gray-200">
+                                    <div className="flex justify-end space-x-3">
+                                        <button className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                            Cancel
                                         </button>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">Push Notifications</h3>
-                                            <p className="text-sm text-gray-500">Receive push notifications in browser</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">System Alerts</h3>
-                                            <p className="text-sm text-gray-500">Get notified about system issues</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'security' && (
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Settings</h2>
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Session Timeout (minutes)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            defaultValue="30"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">Two-Factor Authentication</h3>
-                                            <p className="text-sm text-gray-500">Add an extra layer of security</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">IP Whitelist</h3>
-                                            <p className="text-sm text-gray-500">Restrict access to specific IP addresses</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
+                                        <button className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                                            Save Changes
                                         </button>
                                     </div>
                                 </div>
@@ -201,112 +237,182 @@ export default function SettingsContent() {
                         {activeTab === 'profile' && (
                             <div>
                                 <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Settings</h2>
-                                <div className="space-y-6">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-                                            <span className="text-white font-bold text-xl">AU</span>
-                                        </div>
-                                        <div>
-                                            <button className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                                                Change Avatar
-                                            </button>
-                                        </div>
+                                
+                                {loadingProfile ? (
+                                    <div className="flex items-center justify-center py-12">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                                     </div>
+                                ) : (
+                                    <>
+                                        <div className="space-y-6 mb-8">
+                                            <div className="flex items-center space-x-4 pb-6 border-b border-gray-200">
+                                                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                                                    <span className="text-white font-bold text-xl">
+                                                        {profileData.username ? profileData.username.substring(0, 2).toUpperCase() : 'AD'}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-sm font-medium text-gray-900">{profileData.username || 'Loading...'}</h3>
+                                                    <p className="text-sm text-gray-500">{profileData.role || 'Admin'}</p>
+                                                </div>
+                                            </div>
+                                    
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Full Name
+                                            Username
                                         </label>
                                         <input
                                             type="text"
-                                            defaultValue="Admin User"
+                                            value={profileData.username}
+                                            onChange={(e) => setProfileData({...profileData, username: e.target.value})}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </div>
+                                    
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Email Address
                                         </label>
                                         <input
                                             type="email"
-                                            defaultValue="admin@opentherapy.com"
+                                            value={profileData.email}
+                                            onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </div>
+                                    
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Role
                                         </label>
                                         <input
                                             type="text"
-                                            defaultValue="Super Admin"
+                                            value={profileData.role}
                                             disabled
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                                         />
                                     </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'system' && (
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-6">System Settings</h2>
-                                <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <div className="flex items-center space-x-3 mb-2">
-                                                <ServerIcon className="h-5 w-5 text-gray-600" />
-                                                <h3 className="text-sm font-medium text-gray-900">Database Status</h3>
-                                            </div>
-                                            <p className="text-sm text-gray-600">Connected</p>
-                                            <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                                                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }}></div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <div className="flex items-center space-x-3 mb-2">
-                                                <CloudIcon className="h-5 w-5 text-gray-600" />
-                                                <h3 className="text-sm font-medium text-gray-900">Storage Usage</h3>
-                                            </div>
-                                            <p className="text-sm text-gray-600">2.4 GB / 10 GB</p>
-                                            <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                                                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '24%' }}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Backup Frequency
-                                        </label>
-                                        <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option>Daily</option>
-                                            <option>Weekly</option>
-                                            <option>Monthly</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">Auto Updates</h3>
-                                            <p className="text-sm text-gray-500">Automatically install security updates</p>
-                                        </div>
-                                        <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
+                                    
+                                    <div className="flex justify-end space-x-3">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setMessage({ type: '', text: '' })}
+                                            className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            onClick={handleProfileUpdate}
+                                            disabled={loading}
+                                            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {loading ? 'Updating...' : 'Update Profile'}
                                         </button>
                                     </div>
                                 </div>
+
+                                <div className="pt-8 border-t border-gray-200">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Change Password</h3>
+                                    
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Current Password
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showCurrentPassword ? "text" : "password"}
+                                                    value={passwordData.currentPassword}
+                                                    onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                >
+                                                    {showCurrentPassword ? (
+                                                        <EyeOff className="h-5 w-5" />
+                                                    ) : (
+                                                        <Eye className="h-5 w-5" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                New Password
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showNewPassword ? "text" : "password"}
+                                                    value={passwordData.newPassword}
+                                                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                >
+                                                    {showNewPassword ? (
+                                                        <EyeOff className="h-5 w-5" />
+                                                    ) : (
+                                                        <Eye className="h-5 w-5" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                            <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Confirm New Password
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    value={passwordData.confirmPassword}
+                                                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                >
+                                                    {showConfirmPassword ? (
+                                                        <EyeOff className="h-5 w-5" />
+                                                    ) : (
+                                                        <Eye className="h-5 w-5" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex justify-end space-x-3">
+                                            <button 
+                                                type="button"
+                                                onClick={() => setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })}
+                                                className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                onClick={handlePasswordUpdate}
+                                                disabled={loading}
+                                                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loading ? 'Changing...' : 'Change Password'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </>
+                                )}
                             </div>
                         )}
-
-                        {/* Save Button */}
-                        <div className="mt-8 pt-6 border-t border-gray-200">
-                            <div className="flex justify-end space-x-3">
-                                <button className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                                    Cancel
-                                </button>
-                                <button className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
-                                    Save Changes
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

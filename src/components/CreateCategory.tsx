@@ -1,11 +1,12 @@
 import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 import { Emotion, EmotionalCategory } from "@/types";
 import {
-  PlusIcon,
-  SparklesIcon,
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+  Plus,
+  Sparkles,
+  Trash2,
+  X,
+  Tag,
+} from "lucide-react";
 import { useState } from "react";
 
 interface CreateCategoryProps {
@@ -35,7 +36,26 @@ export default function CreateCategory({
     name: "",
     prompt: "",
     points: 0,
+    directionTags: [],
   });
+
+  const [newTag, setNewTag] = useState("");
+
+  const handleAddTag = () => {
+    if (!newTag.trim()) return;
+    setNewEmotion({
+      ...newEmotion,
+      directionTags: [...(newEmotion.directionTags || []), newTag.trim()],
+    });
+    setNewTag("");
+  };
+
+  const handleRemoveTag = (index: number) => {
+    setNewEmotion({
+      ...newEmotion,
+      directionTags: (newEmotion.directionTags || []).filter((_, i) => i !== index),
+    });
+  };
 
   const handleAddEmotion = () => {
     if (!newEmotion.name.trim()) return;
@@ -43,7 +63,7 @@ export default function CreateCategory({
       ...category,
       emotions: [...category.emotions, { ...newEmotion }],
     });
-    setNewEmotion({ name: "", prompt: "", points: 0 });
+    setNewEmotion({ name: "", prompt: "", points: 0, directionTags: [] });
   };
 
   const handleDeleteEmotion = (index: number) => {
@@ -54,11 +74,12 @@ export default function CreateCategory({
   };
 
   const handleSubmit = () => {
-    // onSubmit(category);
     console.log("Creating category", category);
     createCategory(category).then((c) => {
       console.log("Created", c);
-    });
+    }).catch(err => {
+      console.log('Err',err);
+    })
     onCreate();
     onClose();
   };
@@ -74,7 +95,7 @@ export default function CreateCategory({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                  <SparklesIcon className="h-6 w-6 text-white" />
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">
@@ -89,7 +110,7 @@ export default function CreateCategory({
                 onClick={onClose}
                 className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
               >
-                <XMarkIcon className="h-6 w-6" />
+                <X className="h-6 w-6" />
               </button>
             </div>
           </div>
@@ -227,22 +248,6 @@ export default function CreateCategory({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Emotion Prompt for AI
-                    </label>
-                    <textarea
-                      placeholder="Describe what this emotion represents and how it manifests in daily life..."
-                      value={newEmotion.prompt || ""}
-                      onChange={(e) =>
-                        setNewEmotion({ ...newEmotion, prompt: e.target.value })
-                      }
-                      rows={2}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Emotion Points (optional)
                     </label>
                     <input
@@ -260,12 +265,74 @@ export default function CreateCategory({
                     />
                   </div>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Emotion Prompt for AI
+                  </label>
+                  <textarea
+                    placeholder="Describe what this emotion represents and how it manifests in daily life..."
+                    value={newEmotion.prompt || ""}
+                    onChange={(e) =>
+                      setNewEmotion({ ...newEmotion, prompt: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  />
+                </div>
+
+                {/* Direction Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Direction Tags
+                  </label>
+                  <div className="flex space-x-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="e.g., energizing, grounding, isolating"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    />
+                    <button
+                      onClick={handleAddTag}
+                      disabled={!newTag.trim()}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Tag className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {newEmotion.directionTags && newEmotion.directionTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {newEmotion.directionTags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg text-sm text-purple-700"
+                        >
+                          {tag}
+                          <button
+                            onClick={() => handleRemoveTag(index)}
+                            className="ml-2 text-purple-400 hover:text-purple-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={handleAddEmotion}
                   disabled={!newEmotion.name.trim()}
                   className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  <PlusIcon className="h-5 w-5 mr-2" />
+                  <Plus className="h-5 w-5 mr-2" />
                   Add Emotion
                 </button>
               </div>
@@ -289,21 +356,33 @@ export default function CreateCategory({
                           {emotion.name}
                         </h5>
                         {emotion.prompt && (
-                          <p className="text-xs text-gray-600 leading-relaxed">
+                          <p className="text-xs text-gray-600 leading-relaxed mb-2">
                             {emotion.prompt}
                           </p>
                         )}
                         {typeof emotion.points === "number" && (
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-xs text-gray-600 mb-2">
                             Points: {emotion.points}
                           </p>
+                        )}
+                        {emotion.directionTags && emotion.directionTags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {emotion.directionTags.map((tag, tagIndex) => (
+                              <span
+                                key={tagIndex}
+                                className="inline-flex items-center px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs border border-purple-200"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
                         )}
                       </div>
                       <button
                         onClick={() => handleDeleteEmotion(index)}
                         className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        <TrashIcon className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   ))}

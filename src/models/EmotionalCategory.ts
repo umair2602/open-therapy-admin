@@ -4,6 +4,7 @@ export interface Emotion {
   name: string;
   prompt?: string;
   points?: number;
+  directionTags?: string[];
 }
 
 export interface EmotionalCategoryDocument extends Document {
@@ -29,6 +30,11 @@ const EmotionSchema = new Schema<Emotion>({
       message: "points must be an integer",
     },
   },
+  directionTags: {
+    type: [String],
+    required: false,
+    default: [],
+  },
 });
 
 const EmotionalCategorySchema = new Schema<EmotionalCategoryDocument>(
@@ -48,5 +54,5 @@ export default mongoose.models.EmotionalCategory ||
   mongoose.model<EmotionalCategoryDocument>(
     "EmotionalCategory",
     EmotionalCategorySchema,
-    "emotional_categories" // 👈 force same collection name as Beanie
+    "emotional_categories"
   );

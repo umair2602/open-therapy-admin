@@ -27,6 +27,48 @@ export function generateSystemPrompt(prompt: BloomGlobalPrompt): string {
     operationalNotes,
   } = prompt;
 
+  const emotionalProfilesSection =
+    profilePersonalization.enabled && profilePersonalization.profiles?.length
+      ? `
+---
+
+## Emotional Profiles (for internal tone calibration)
+
+Bloom uses these **internal emotional blueprints** to adapt tone and style dynamically.
+*(Never mention these profiles by name to the user.)*
+
+Directory Path: \`${profilePersonalization.directoryPath}\`
+Quick Guidelines Fallback: "${profilePersonalization.quickGuidelinesFallback}"
+
+${profilePersonalization.profiles
+  .filter((profile) => profile.enabled)
+  .map(
+    (profile) => `
+### Profile: ${profile.name}
+- **ID:** ${profile.id}
+- **Description:** ${profile.description}
+- **Tone:** ${profile.bloomTone}
+- **Opening Cue:** "${profile.opening}"
+- **Positive Aspects:** ${profile.positiveAspects}
+- **Challenging Aspects:** ${profile.challengingAspects}
+- **Main Challenges:** ${profile.mainChallenges}
+- **Goals:** ${profile.goals}
+- **Brief Description:** ${profile.briefDescription}
+
+**Keywords**
+- Positive: ${profile.keywords.positive.join(", ")}
+- Challenging: ${profile.keywords.challenging.join(", ")}
+
+**Way of Feeling:** ${profile.wayOfFeeling}
+**Self-care Paths:** ${profile.selfCarePaths}
+**Daily Practices:** ${profile.dailyPractices.join(", ")}
+**Interventions:** ${profile.interventions}
+`
+  )
+  .join("\n")}
+`
+      : "";
+
   return `BLOOM_SYSTEM_PROMPT = """
 ---
 ---
@@ -110,38 +152,29 @@ ${
 - Bloom should adjust tone and conversational style according to the identified emotional profile.
 - **Directory path:** \`${profilePersonalization.directoryPath}\`
 - **Quick guidelines fallback:** "${profilePersonalization.quickGuidelinesFallback}"
-
-*(Apply profile guidelines naturally — never name the profile to the user.)*
 `
     : "- Profile personalization is disabled."
 }
 
+${emotionalProfilesSection}
+
 ---
 
 ## Life Areas and Emotion Journal Integration
-
-${
-  areasOfLifeAndDiary
-    ? `
+${areasOfLifeAndDiary ? `
 **Directory:** \`${areasOfLifeAndDiary.directoryPath}\`
 **File naming pattern:** \`${areasOfLifeAndDiary.fileNamingPattern}\`
-
 **Supported Life Areas:**
-${areasOfLifeAndDiary.supportedAreas.map((area) => `- ${area}`).join("\n")}
-
+${areasOfLifeAndDiary.supportedAreas.map((a) => `- ${a}`).join("\n")}
 **Supported Moods:**
-${areasOfLifeAndDiary.supportedMoods.map((mood) => `- ${mood}`).join("\n")}
-
+${areasOfLifeAndDiary.supportedMoods.map((m) => `- ${m}`).join("\n")}
 **Emotion Opening Mappings:**
 ${areasOfLifeAndDiary.emotionToOpeningMapping
-  .filter((mapping) => mapping.enabled)
-  .map((mapping) => `- **${mapping.emotion}**: "${mapping.opening}"`)
+  .filter((m) => m.enabled)
+  .map((m) => `- **${m.emotion}**: "${m.opening}"`)
   .join("\n")}
-
 **Integration Rule:** ${areasOfLifeAndDiary.integrationRule}
-`
-    : ""
-}
+` : ""}
 
 ---
 
@@ -158,43 +191,25 @@ ${brevityAndDelivery.stopTriggers
   .map((trigger) => `- **${trigger.type}**: ${trigger.description}`)
   .join("\n")}
 
-**Never deliver a full plan at once.**
-- If user asks for "everything," respond: *"I can guide you step by step. Would you like to start with part A, B, or C?"*
-- Break any explanation into **max ${
-    brevityAndDelivery.maxItemsPerBlock
-  }-step blocks**, offering to continue **on demand** ("Would you like me to keep going?").
-
 ---
 
 ## Safety and Crisis Management
 
-${
-  safety
-    ? `
+${safety ? `
 **High Risk Directory:** \`${safety.highRiskDirectory}\`
 **Trigger File:** \`${safety.triggerFile}\`
 **Crisis Protocol File:** \`${safety.crisisProtocolFile}\`
 **Interruption Message:** "${safety.interruptionMessage}"
-**Block Diagnosis/Prescription:** ${
-        safety.blockDiagnosisPrescription ? "Yes" : "No"
-      }
-
-- Always monitor risk triggers.
-- If triggers detected, **consult instructions** in file \`global_triggers.md\` located in folder \`high_risk/\`.
-- If classified as risk: **interrupt flow** and activate \`crisis_protocol\` (file: \`global_crisis_protocol.md\`).
-- Do not diagnose or prescribe.
-- Use short phrases, with human warmth and redirection.
-`
-    : ""
-}
+**Block Diagnosis/Prescription:** ${safety.blockDiagnosisPrescription ? "Yes" : "No"}
+` : ""}
 
 ---
 
-## Quick Tools (when user accepts)
+## Quick Tools
 
 ${quickTools.practices
-  .filter((practice) => practice.enabled)
-  .map((practice) => `- **${practice.id}**: "${practice.text}"`)
+  .filter((p) => p.enabled)
+  .map((p) => `- **${p.id}**: "${p.text}"`)
   .join("\n")}
 
 ---
@@ -203,7 +218,6 @@ ${quickTools.practices
 
 **Do:**
 ${languageStyle.doList.map((rule) => `- ${rule}`).join("\n")}
-
 **Don't:**
 ${languageStyle.dontList.map((rule) => `- ${rule}`).join("\n")}
 
@@ -215,38 +229,26 @@ ${languageStyle.dontList.map((rule) => `- ${rule}`).join("\n")}
 **Detail Question:** "${contentLongPolicy.detailQuestion}"
 **Batch Size:** ${contentLongPolicy.batchSize}
 
-- Offer **short summary** + option: "Would you like me to break this down into small steps?"
-- If confirmed, deliver **max ${
-    contentLongPolicy.batchSize
-  } items per batch** and **ask** if they want to continue.
-
 ---
 
 ## Response Policies
 
 **Always do:**
 ${policies.alwaysRules.map((rule) => `- ${rule}`).join("\n")}
-
 **Never do:**
 ${policies.neverRules.map((rule) => `- ${rule}`).join("\n")}
 
 ---
 
-## User Feedback Collection
+## Feedback Collection
 
 ${
   feedback.enabled
     ? `
 **Enabled:** Yes
-**Feedback Moments:** ${feedback.moments.join(", ")}
-**Silence Rule:** ${feedback.silenceRule}
-
+**Moments:** ${feedback.moments.join(", ")}
 **Sample Questions:**
-${feedback.sampleQuestions.map((question) => `- "${question}"`).join("\n")}
-
-- Bloom should, at key moments, **ask for short user feedback**.
-- Goal: Understand if response was clear and helpful — to adjust tone and interaction style.
-- Always simple and max 2 sentences.
+${feedback.sampleQuestions.map((q) => `- "${q}"`).join("\n")}
 `
     : "**Enabled:** No"
 }
@@ -259,12 +261,12 @@ ${feedback.sampleQuestions.map((question) => `- "${question}"`).join("\n")}
 **Profile Tone:** ${control.profileTone}
 
 ${
-  control.optionalRateLimits && control.optionalRateLimits.length > 0
+  control.optionalRateLimits?.length
     ? `
 **Rate Limits:**
 ${control.optionalRateLimits
-  .filter((limit) => limit.enabled)
-  .map((limit) => `- **${limit.type}**: ${limit.limit} per ${limit.window}`)
+  .filter((l) => l.enabled)
+  .map((l) => `- **${l.type}**: ${l.limit} per ${l.window}`)
   .join("\n")}
 `
     : ""
@@ -274,58 +276,17 @@ ${control.optionalRateLimits
 
 ## Fixed Messages
 
-**Welcome Message:**
-"${fixedMessages.welcome}"
-
-**Closing Message:**
-"${fixedMessages.closing}"
+**Welcome Message:** "${fixedMessages.welcome}"
+**Closing Message:** "${fixedMessages.closing}"
 
 ---
 
 ## Operational Notes
 
-**When asked for more:**
-"${operationalNotes.replyWhenAskedMore}"
-
-**When asked for summary:**
-"${operationalNotes.replyWhenAskedSummary}"
-
-**When user doesn't want to go deeper:**
-"${operationalNotes.replyWhenUserDoesntWantToGoDeeper}"
+**When asked for more:** "${operationalNotes.replyWhenAskedMore}"
+**When asked for summary:** "${operationalNotes.replyWhenAskedSummary}"
+**When user doesn't want to go deeper:** "${operationalNotes.replyWhenUserDoesntWantToGoDeeper}"
 
 ---
-
-## Technical Parameters
-
-- \`MAX_SENTENCES=${conversationRules.maxSentences}\`
-- \`MAX_CHARS=${conversationRules.maxChars}\`
-- \`ONE_QUESTION_PER_REPLY=${conversationRules.oneQuestionPerReply}\`
-- \`OFFER_MICRO_ACTION_OPTIONAL=${conversationRules.offerMicroActionOptional}\`
-- \`CHUNKED_DELIVERY=${conversationRules.chunkedDelivery}\`
-- \`ASK_FEEDBACK=${conversationRules.askFeedback}\`
-- \`CRISIS_PROTOCOL=${control.crisisProtocol}\`
-- \`PROFILE_TONE=${control.profileTone}\`
-
----
-
-## Signs of a "Good Bloom Response"
-
-- Max ${conversationRules.maxSentences} sentences.
-- Validates user's input in 1 short sentence.
-- Asks **${
-    conversationRules.oneQuestionPerReply
-      ? "1 open-ended question"
-      : "focused questions"
-  }** inviting deeper exploration.
-- Shows **active listening** — reflecting a keyword or idea from the user.
-- Keeps focus on dialogue; only suggests practice if user shows openness.
-- No lectures, no "solve everything at once."
-
----
-
-> **Operational Note:**
-> - If user says "tell me more," release 2–3 more sentences and **ask if they want to continue**.
-> - If user asks for "summary," respond in **1–2 objective sentences**.
-> - If user doesn't want to go deeper, simply thank them and keep tone warm.
 """`;
 }

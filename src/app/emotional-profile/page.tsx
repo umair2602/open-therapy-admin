@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, Edit, Plus, X, RefreshCw } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
+import ProfilesTab from "./ProfilesTab";
 
 /* -------------------------------------------------
    Types (mirrors the DB model)
@@ -87,6 +88,7 @@ const TagSelect: React.FC<{
    Main component
    ------------------------------------------------- */
 function EmotionalProfileContent() {
+  const [tab, setTab] = useState<"questions" | "profiles">("questions");
   const [items, setItems] = useState<EQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -187,6 +189,12 @@ function EmotionalProfileContent() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="mb-4">
+            <div className="inline-flex rounded-lg bg-gray-100 p-1">
+              <button onClick={() => setTab("questions")} className={`px-3 py-1 rounded ${tab === "questions" ? "bg-white shadow" : ""}`}>Questions</button>
+              <button onClick={() => setTab("profiles")} className={`px-3 py-1 rounded ${tab === "profiles" ? "bg-white shadow" : ""}`}>Profiles</button>
+            </div>
+          </div>
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -218,84 +226,98 @@ function EmotionalProfileContent() {
             </div>
           </div>
 
-          {/* Loading / Empty */}
-          {loading ? (
+          {tab === "questions" && (
+            <>
+              {/* Loading / Empty */}
+              {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             </div>
-          ) : items.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 text-lg">No questions yet</p>
-              <p className="text-gray-400 mt-2">
-                Click "Create Question" to add your first question
-              </p>
-            </div>
-          ) : (
-            /* List */
-            <div className="space-y-4">
-              {items.map((it) => (
-                <div
-                  key={it.id}
-                  className="bg-gradient-to-r from-white to-gray-50 rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
-                          {it.id}
-                        </span>
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                          {it.category}
-                        </span>
-                      </div>
-
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        {it.question}
-                      </h3>
-
-                      <div className="flex flex-wrap gap-2">
-                        {(it.options || []).map((opt, idx) => (
-                          <div
-                            key={idx}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm border border-gray-200 flex flex-col gap-1"
-                          >
-                            <span>{opt.text}</span>
-                            {opt.profileTags?.length ? (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {opt.profileTags.map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs"
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : null}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 ml-4">
-                      <button
-                        onClick={() => openEdit(it)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Edit"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => remove(it.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
+              ) : items.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500 text-lg">No questions yet</p>
+                  <p className="text-gray-400 mt-2">
+                    Click "Create Question" to add your first question
+                  </p>
                 </div>
-              ))}
+              ) : (
+                /* List */
+                <div className="space-y-4">
+                  {items.map((it) => (
+                    <div
+                      key={it.id}
+                      className="bg-gradient-to-r from-white to-gray-50 rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                              {it.id}
+                            </span>
+                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                              {it.category}
+                            </span>
+                          </div>
+
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                            {it.question}
+                          </h3>
+
+                          <div className="flex flex-wrap gap-2">
+                            {(it.options || []).map((opt, idx) => (
+                              <div
+                                key={idx}
+                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm border border-gray-200 flex flex-col gap-1"
+                              >
+                                <span>{opt.text}</span>
+                                {opt.profileTags?.length ? (
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {opt.profileTags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            onClick={() => openEdit(it)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => remove(it.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === "profiles" && (
+            <div>
+              {/* Lazy-load the Profiles tab component to avoid changing question flow */}
+              <React.Suspense fallback={<div>Loading profiles...</div>}>
+                {/* Use dynamic import to avoid heavy bundle, but simple inline render for now */}
+                <ProfilesTab />
+              </React.Suspense>
             </div>
           )}
         </div>

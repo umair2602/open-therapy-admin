@@ -65,6 +65,11 @@ const navigation: NavigationItem[] = [
     href: "/emotional-categories",
     icon: HeartIcon,
   },
+  {
+    name: "Emotional Profile",
+    href: "/emotional-profile",
+    icon: HeartIcon,
+  },
   { name: "Content Management", href: "/content", icon: DocumentTextIcon },
   { name: "Books", href: "/books", icon: DocumentTextIcon },
   { name: "Daily Tools", href: "/daily-tools", icon: ShieldExclamationIcon },

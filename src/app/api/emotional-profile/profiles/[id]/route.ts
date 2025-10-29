@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db/mongodb";
 import EmotionalProfile from "@/models/EmotionalProfile";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await dbConnect();
     const doc = await EmotionalProfile.findOne({ id }).lean();
     if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -14,9 +14,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     await dbConnect();
     const updated = await EmotionalProfile.findOneAndUpdate({ id }, body, { new: true });
@@ -27,9 +27,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await dbConnect();
     const deleted = await EmotionalProfile.findOneAndDelete({ id });
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });

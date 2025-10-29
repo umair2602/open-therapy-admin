@@ -23,6 +23,7 @@ export interface IEmotionalQuestion {
 }
 
 // Interface for EmotionalQuestion document with Mongoose methods
+//@ts-ignore
 export interface IEmotionalQuestionDocument extends IEmotionalQuestion, Document {
   _id: mongoose.Types.ObjectId;
 }

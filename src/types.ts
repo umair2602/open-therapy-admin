@@ -24,6 +24,8 @@ export interface DailyToolItem {
   name: string;
   desc?: string;
   audioUrl?: string;
+  time?: number;
+  isSpecial?: boolean;
 }
 
 export interface DailyToolCategory {

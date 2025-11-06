@@ -138,7 +138,7 @@ export default function ResourceManagement() {
           <input
             type="file"
             ref={fileInputRef}
-            accept=".pdf,.md"
+            accept=".pdf,.md,.docx"
             className="hidden"
             onChange={handleFileChange}
           />

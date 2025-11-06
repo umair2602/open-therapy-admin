@@ -22,8 +22,6 @@ export default function EmotionalCategoriesContent() {
   const { categories, isFetching, refetch, deleteCategory } =
     useEmotionalCategories();
 
-  console.log("Categories", categories);
-
   const [selectedCategory, setSelectedCategory] = useState<EmotionalCategory>();
   const [createCategoryVisible, setCreateCategoryVisible] =
     useState<boolean>(false);

@@ -26,3 +26,28 @@ export const showErrorToast = (text: string) => {
     ),
   });
 };
+
+type EmotionalCategory = {
+  emotions?: {
+    directionTags?: string[];
+  }[];
+};
+
+/**
+ * Extracts all unique direction tags from emotional categories.
+ */
+export function getUniqueDirectionTags(categories: EmotionalCategory[] = []): string[] {
+  const tags = new Set<string>();
+
+  categories.forEach((category) => {
+    category.emotions?.forEach((emotion) => {
+      emotion.directionTags?.forEach((tag) => {
+        if (tag && tag.trim()) {
+          tags.add(tag.trim());
+        }
+      });
+    });
+  });
+
+  return Array.from(tags);
+}

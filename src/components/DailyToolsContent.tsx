@@ -79,6 +79,7 @@ export default function DailyToolsContent() {
   const onCreate = async () => {
     if (!draft.title) return;
     if (draft._id) {
+      console.log('Draft',draft);
       await updateCategory({ id: draft._id, data: draft as DailyToolCategory });
     } else {
       await createCategory(draft as DailyToolCategory);
@@ -214,68 +215,164 @@ export default function DailyToolsContent() {
                     <PlusIcon className="h-4 w-4" /> Add Tool
                   </button>
                 </div>
-                <div className="space-y-4">
-                  {(draft.tools || []).map((tool, idx) => (
-                    <div
-                      key={idx}
-                      className="grid grid-cols-1 gap-4 items-center"
-                    >
-                      <input
-                        placeholder="Name"
-                        value={tool.name}
-                        onChange={(e) => {
-                          const tools = [...(draft.tools || [])];
-                          tools[idx] = { ...tools[idx], name: e.target.value };
-                          setDraft({ ...draft, tools });
-                        }}
-                        className="rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                      <textarea
-                        placeholder="Description"
-                        value={tool.desc || ""}
-                        onChange={(e) => {
-                          const tools = [...(draft.tools || [])];
-                          tools[idx] = { ...tools[idx], desc: e.target.value };
-                          setDraft({ ...draft, tools });
-                        }}
-                        rows={10}
-                        className="rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="file"
-                          accept="audio/*"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadAudio(f, idx);
-                          }}
-                          className="block w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-lg border-gray-300"
-                        />
-                        {uploadingIndex === idx && (
-                          <span className="inline-flex items-center gap-2 text-xs text-gray-600">
-                            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-                            Uploading...
-                          </span>
-                        )}
-                        {tool.audioUrl && (
-                          <a
-                            href={tool.audioUrl}
-                            target="_blank"
-                            className="text-sm text-gray-600 underline"
-                          >
-                            Audio
-                          </a>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTool(idx)}
-                          className="px-3 py-2 text-xs rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
-                        >
-                          Remove
-                        </button>
-                      </div>
+
+                {/* Tools List View */}
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  {(draft.tools || []).length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 text-sm">
+                      No tools added yet. Click "Add Tool" to get started.
                     </div>
-                  ))}
+                  ) : (
+                    <ul className="divide-y divide-gray-200">
+                      {(draft.tools || []).map((tool: any, idx) => (
+                        <li key={idx} className="p-4 hover:bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center">
+                                <input
+                                  placeholder="Tool Name"
+                                  value={tool.name}
+                                  onChange={(e) => {
+                                    const tools = [...(draft.tools || [])];
+                                    tools[idx] = {
+                                      ...tools[idx],
+                                      name: e.target.value,
+                                    };
+                                    setDraft({ ...draft, tools });
+                                  }}
+                                  className="font-medium text-gray-900 focus:outline-none focus:ring-0 border-0 p-0 bg-transparent"
+                                />
+                                {tool?.audioUrl && (
+                                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    Has Audio
+                                  </span>
+                                )}
+                                {tool?.isSpecial && (
+                                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                    Especial
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  // Create a modal or expand this item for editing
+                                  const toolsCopy: any = [...(draft.tools || [])];
+                                  const expanded = {
+                                    ...toolsCopy[idx],
+                                    //@ts-ignore
+                                    expanded: !toolsCopy[idx]?.expanded,
+                                  };
+                                  toolsCopy[idx] = expanded;
+                                  setDraft({ ...draft, tools: toolsCopy });
+                                }}
+                                className="p-1 rounded-full text-blue-600 hover:bg-blue-50"
+                              >
+                                <PencilIcon className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveTool(idx)}
+                                className="p-1 rounded-full text-red-600 hover:bg-red-50"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Expanded view for editing */}
+                          {tool.expanded && (
+                            <div className="mt-3 space-y-3 pl-2 border-l-2 border-blue-200">
+                              <div className="flex items-center gap-3">
+                                <label className="block text-xs font-medium text-gray-500">
+                                  Is Special
+                                </label>
+                                <input
+                                  type='checkbox'
+                                  value={tool?.time || ""}
+                                  onChange={(e) => {
+                                    const tools = [...(draft.tools || [])];
+                                    tools[idx] = {
+                                      ...tools[idx],
+                                      isSpecial: e.target.checked,
+                                    };
+                                    setDraft({ ...draft, tools });
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                  Time
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Time"
+                                  value={tool?.time || ""}
+                                  onChange={(e) => {
+                                    const tools = [...(draft.tools || [])];
+                                    tools[idx] = {
+                                      ...tools[idx],
+                                      time: Number(e.target.value),
+                                    };
+                                    setDraft({ ...draft, tools });
+                                  }}
+                                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                  Description
+                                </label>
+                                <textarea
+                                  placeholder="Tool description"
+                                  value={tool.desc || ""}
+                                  onChange={(e) => {
+                                    const tools = [...(draft.tools || [])];
+                                    tools[idx] = {
+                                      ...tools[idx],
+                                      desc: e.target.value,
+                                    };
+                                    setDraft({ ...draft, tools });
+                                  }}
+                                  rows={3}
+                                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                  Audio File
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => {
+                                      const f = e.target.files?.[0];
+                                      if (f) handleUploadAudio(f, idx);
+                                    }}
+                                    className="block w-full text-sm text-gray-700 file:mr-3 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-lg border-gray-300"
+                                  />
+                                  {uploadingIndex === idx && (
+                                    <span className="inline-flex items-center gap-2 text-xs text-gray-600">
+                                      <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+                                      Uploading...
+                                    </span>
+                                  )}
+                                  {tool.audioUrl && (
+                                    <audio controls className="h-8 w-32">
+                                      <source src={tool.audioUrl} />
+                                    </audio>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
               <div className="mt-6 flex gap-3 justify-end">
@@ -387,27 +484,89 @@ export default function DailyToolsContent() {
             </div>
             {expandedCategory === category._id && (
               <div className="p-6 bg-gray-50">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {category.tools.map((tool, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white rounded-lg p-4 border border-gray-200"
-                    >
-                      <div className="font-semibold text-gray-900">
-                        {tool.name}
-                      </div>
-                      {tool.desc && (
-                        <div className="text-sm text-gray-600 mt-1">
-                          {tool.desc}
-                        </div>
-                      )}
-                      {tool.audioUrl && (
-                        <audio controls className="mt-3 w-full">
-                          <source src={tool.audioUrl} />
-                        </audio>
-                      )}
+                <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                  {category.tools.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 text-sm">
+                      No tools in this category.
                     </div>
-                  ))}
+                  ) : (
+                    <ul className="divide-y divide-gray-200">
+                      {category.tools.map((tool: any, idx) => (
+                        <li key={idx} className="p-4 hover:bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center">
+                                <span className="font-medium text-gray-900">
+                                  {tool.name}
+                                </span>
+                                {tool.audioUrl && (
+                                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    Has Audio
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const toolsCopy: any = [...category.tools];
+                                const expanded = {
+                                  ...toolsCopy[idx],
+                                  expanded: !toolsCopy[idx].expanded,
+                                };
+                                toolsCopy[idx] = expanded;
+                                const updatedCategory = {
+                                  ...category,
+                                  tools: toolsCopy,
+                                };
+                                // This is just for UI display, not saving to backend
+                                setExpandedCategory(null);
+                                setTimeout(() => {
+                                  setExpandedCategory(category._id as string);
+                                }, 0);
+                              }}
+                              className="p-1 rounded-full text-blue-600 hover:bg-blue-50"
+                            >
+                              {tool.expanded ? (
+                                <span className="text-xs">Collapse</span>
+                              ) : (
+                                <span className="text-xs">Details</span>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Expanded view for details */}
+                          {tool.expanded && (
+                            <div className="mt-3 space-y-3 pl-2 border-l-2 border-blue-200">
+                              {tool.desc && (
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    Description
+                                  </label>
+                                  <p className="text-sm text-gray-700">
+                                    {tool.desc}
+                                  </p>
+                                </div>
+                              )}
+                              {tool.audioUrl && (
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    Audio
+                                  </label>
+                                  <audio
+                                    controls
+                                    className="h-8 w-full max-w-md"
+                                  >
+                                    <source src={tool.audioUrl} />
+                                  </audio>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             )}

@@ -1,8 +1,11 @@
 "use client";
 
 import { useBooks } from "@/hooks/useBooks";
+import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
+import { getUniqueDirectionTags } from "@/lib/utils";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useMemo, useState } from "react";
+import { get } from "http";
+import { useEffect, useMemo, useState } from "react";
 
 type DraftBook = {
   _id?: string;
@@ -41,7 +44,7 @@ const directionTags = [
   "breathe",
   "anchor_present",
   "grounding",
-  "self_compassion"
+  "self_compassion",
 ];
 
 export default function BooksContent() {
@@ -66,7 +69,12 @@ export default function BooksContent() {
     directionTags: [],
     lifeAreas: [],
   });
+  const { categories } = useEmotionalCategories();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [directionTags, setDirectionTags] = useState<string[]>([]);
+
+  console.log("Categories", categories);
 
   const closeModal = () => {
     setModalOpen(false);
@@ -85,7 +93,14 @@ export default function BooksContent() {
 
   const onSave = async () => {
     console.log("Draft", draft);
-    if (!draft.title || !draft.category || !draft.author || !draft.imageURL || !draft.pdfURL) return;
+    if (
+      !draft.title ||
+      !draft.category ||
+      !draft.author ||
+      !draft.imageURL ||
+      !draft.pdfURL
+    )
+      return;
     if (draft._id) {
       await updateBook({ id: draft._id, data: draft });
     } else {
@@ -98,6 +113,7 @@ export default function BooksContent() {
   const [imageError, setImageError] = useState<string | null>(null);
   const [pdfUploading, setPdfUploading] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+
   const handleImageFile = async (file: File) => {
     setImageError(null);
     const objectUrl = URL.createObjectURL(file);
@@ -152,6 +168,13 @@ export default function BooksContent() {
   };
 
   const tableRows = useMemo(() => books ?? [], [books]);
+
+  useEffect(() => {
+    if (categories && categories?.length > 0) {
+      const tags = getUniqueDirectionTags(categories);
+      setDirectionTags(tags);
+    }
+  }, [categories]);
 
   return (
     <div className="space-y-6">
@@ -541,7 +564,13 @@ export default function BooksContent() {
                 </button>
                 <button
                   onClick={onSave}
-                  disabled={!draft.title || !draft.category || !draft.author || !draft.imageURL || !draft.pdfURL}
+                  disabled={
+                    !draft.title ||
+                    !draft.category ||
+                    !draft.author ||
+                    !draft.imageURL ||
+                    !draft.pdfURL
+                  }
                   className="px-4 py-2 rounded-lg disabled:bg-gray-400 text-white bg-blue-600 hover:bg-blue-700"
                 >
                   Save

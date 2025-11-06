@@ -6,6 +6,7 @@ export interface DailyToolItem {
   audioUrl?: string; // Stored URL under /uploads or external
   time?: number;
   isSpecial?: boolean;
+  directionTags?: string[]; // Optional direction tags for categorization
 }
 
 export interface DailyToolCategoryDocument extends Document {
@@ -21,7 +22,8 @@ const DailyToolItemSchema = new Schema<DailyToolItem>({
   time: {
     type: Number
   },
-  isSpecial: { type: Boolean, default: false }
+  isSpecial: { type: Boolean, default: false },
+  directionTags: { type: [String], default: [] },
 });
 
 const DailyToolCategorySchema = new Schema<DailyToolCategoryDocument>(

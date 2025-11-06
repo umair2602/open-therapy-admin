@@ -1,6 +1,8 @@
 "use client";
 
 import { useDailyTools } from "@/hooks/useDailyTools";
+import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
+import { getUniqueDirectionTags } from "@/lib/utils";
 import { DailyToolCategory, DailyToolItem } from "@/types";
 import {
   PlusIcon,
@@ -9,7 +11,7 @@ import {
   TrashIcon,
   EyeIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DailyToolsContent() {
   const {
@@ -25,6 +27,7 @@ export default function DailyToolsContent() {
     isUpdating,
     isDeleting,
   } = useDailyTools();
+  const {categories: emotionalCategories} = useEmotionalCategories();
 
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -36,6 +39,7 @@ export default function DailyToolsContent() {
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const [uploadingIcon, setUploadingIcon] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [directionTags, setDirectionTags] = useState<string[]>([]);
 
   const resetDraft = () => setDraft({ title: "", icon: "", tools: [] });
 
@@ -87,6 +91,13 @@ export default function DailyToolsContent() {
     setCreating(false);
     resetDraft();
   };
+
+  useEffect(() => {
+      if (emotionalCategories && emotionalCategories?.length > 0) {
+        const tags = getUniqueDirectionTags(emotionalCategories);
+        setDirectionTags(tags);
+      }
+    }, [emotionalCategories]);
 
   return (
     <>
@@ -258,7 +269,6 @@ export default function DailyToolsContent() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  // Create a modal or expand this item for editing
                                   const toolsCopy: any = [...(draft.tools || [])];
                                   const expanded = {
                                     ...toolsCopy[idx],
@@ -291,7 +301,7 @@ export default function DailyToolsContent() {
                                 </label>
                                 <input
                                   type='checkbox'
-                                  value={tool?.time || ""}
+                                  checked={tool?.isSpecial || false}
                                   onChange={(e) => {
                                     const tools = [...(draft.tools || [])];
                                     tools[idx] = {
@@ -339,6 +349,40 @@ export default function DailyToolsContent() {
                                   rows={3}
                                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                                 />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                  Direction Tags
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {directionTags.map((tag) => {
+                                    const selected = tool.directionTags?.includes(tag);
+                                    return (
+                                      <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => {
+                                          const tools = [...(draft.tools || [])];
+                                          const currentTags = tools[idx].directionTags || [];
+                                          tools[idx] = {
+                                            ...tools[idx],
+                                            directionTags: currentTags.includes(tag)
+                                              ? currentTags.filter((t) => t !== tag)
+                                              : [...currentTags, tag]
+                                          };
+                                          setDraft({ ...draft, tools });
+                                        }}
+                                        className={`px-3 py-1 rounded-lg border text-sm font-medium transition ${
+                                          selected
+                                            ? "bg-green-600 text-white border-green-600"
+                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                        }`}
+                                      >
+                                        {tag}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
                               <div>
                                 <label className="block text-xs font-medium text-gray-500 mb-1">
@@ -495,14 +539,23 @@ export default function DailyToolsContent() {
                         <li key={idx} className="p-4 hover:bg-gray-50">
                           <div className="flex items-center justify-between">
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center">
+                              <div className="flex items-center flex-wrap gap-2">
                                 <span className="font-medium text-gray-900">
                                   {tool.name}
                                 </span>
                                 {tool.audioUrl && (
-                                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                     Has Audio
                                   </span>
+                                )}
+                                {tool.directionTags && tool.directionTags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1">
+                                    {tool.directionTags.map((tag: string) => (
+                                      <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -545,6 +598,16 @@ export default function DailyToolsContent() {
                                   </label>
                                   <p className="text-sm text-gray-700">
                                     {tool.desc}
+                                  </p>
+                                </div>
+                              )}
+                              {tool.time && (
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    Time
+                                  </label>
+                                  <p className="text-sm text-gray-700">
+                                    {tool.time} minutes
                                   </p>
                                 </div>
                               )}

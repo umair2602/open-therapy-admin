@@ -447,7 +447,7 @@ const BloomGlobalPromptSchema = new Schema<IBloomGlobalPrompt>(
   {
     ageGroup: {
       type: String,
-      enum: ["adolescence", "young_adult", "adult", "middle_age"],
+      enum: ["adolescence", "young-adult", "adult", "middle-age"],
       required: true,
       index: true,
     },

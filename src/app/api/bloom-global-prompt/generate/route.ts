@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
     const ageGroup =
       (searchParams.get("ageGroup") as
         | "adolescence"
-        | "young_adult"
+        | "young-adult"
         | "adult"
-        | "middle_age"
+        | "middle-age"
         | null) || "adult";
 
     // Get the current prompt for age group from database

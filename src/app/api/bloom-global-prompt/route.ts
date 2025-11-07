@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
     const ageGroup =
       (searchParams.get("ageGroup") as
         | "adolescence"
-        | "young_adult"
+        | "young-adult"
         | "adult"
-        | "middle_age"
+        | "middle-age"
         | null) || "adult";
 
     // Try to find existing prompt for this age group
@@ -98,9 +98,9 @@ export async function POST(request: NextRequest) {
       const ageGroup =
         (body.ageGroup as
           | "adolescence"
-          | "young_adult"
+          | "young-adult"
           | "adult"
-          | "middle_age"
+          | "middle-age"
           | undefined) || "adult";
       const resetData = {
         ...DEFAULT_BLOOM_GLOBAL_PROMPT,

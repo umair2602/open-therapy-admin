@@ -57,15 +57,29 @@ export const uploadDailyToolAudio = async (file: File): Promise<string> => {
 };
 
 export const uploadDailyToolIcon = async (file: File): Promise<string> => {
-  const formData = new FormData();
-  formData.append("file", file);
+  // Use pre-signed URL for icons too to avoid large multipart requests through server
+  const signRes = await api.post(`${API_ENDPOINTS.DAILY_TOOLS}/sign-upload-icon`, {
+    fileName: file.name,
+    fileType: file.type || "image/png",
+  });
 
-  const res = await api.post(
-    `${API_ENDPOINTS.DAILY_TOOLS}/upload-icon`,
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
-  return res.data.url as string;
+  const { uploadUrl, publicUrl } = signRes.data as {
+    uploadUrl: string;
+    publicUrl: string;
+  };
+
+  const putRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type || "image/png",
+    },
+    body: file,
+  });
+
+  if (!putRes.ok) {
+    const text = await putRes.text().catch(() => "");
+    throw new Error(`Failed to upload icon to storage: ${putRes.status} ${text}`);
+  }
+
+  return publicUrl;
 };

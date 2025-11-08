@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   PlusIcon,
   TrashIcon,
@@ -44,7 +44,8 @@ export default function ProfilePersonalizationSection({
     interventions: "",
   });
 
-  const handleInputChange = (
+  // Memoize the handleInputChange function to prevent unnecessary re-renders
+  const handleInputChange = useCallback((
     field: keyof BloomGlobalPrompt["profilePersonalization"],
     value: string | boolean | EmotionalProfile[]
   ) => {
@@ -54,7 +55,7 @@ export default function ProfilePersonalizationSection({
         [field]: value,
       },
     });
-  };
+  }, [prompt.profilePersonalization, updatePrompt]);
 
   const toggleProfileExpansion = (profileId: string) => {
     setExpandedProfiles((prev) =>
@@ -126,7 +127,7 @@ export default function ProfilePersonalizationSection({
     });
   };
 
-  const updateProfileField = (
+  const updateProfileField = useCallback((
     profileId: string,
     field: keyof EmotionalProfile,
     value: any
@@ -135,7 +136,16 @@ export default function ProfilePersonalizationSection({
       (p) => (p.id === profileId ? { ...p, [field]: value } : p)
     );
     handleInputChange("profiles", updatedProfiles);
-  };
+
+    // If the profile ID changes, keep editing state and expansion in sync
+    if (field === "id" && typeof value === "string") {
+      const newId = value as string;
+      setEditingProfile((prev) => (prev === profileId ? newId : prev));
+      setExpandedProfiles((prev) =>
+        prev.map((id) => (id === profileId ? newId : id))
+      );
+    }
+  }, [prompt.profilePersonalization.profiles, handleInputChange]);
 
   const addKeyword = (
     profileId: string,
@@ -232,8 +242,8 @@ export default function ProfilePersonalizationSection({
           Emotional Profiles
         </h4>
         <div className="space-y-4">
-          {(prompt.profilePersonalization.profiles || []).map((profile) => (
-            <div key={profile.id} className="border border-gray-200 rounded-lg">
+          {(prompt.profilePersonalization.profiles || []).map((profile, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg">
               <div className="flex items-center justify-between p-4 bg-white rounded-t-lg">
                 <div className="flex items-center space-x-3">
                   <button
@@ -251,7 +261,7 @@ export default function ProfilePersonalizationSection({
                       {profile.name}
                     </h5>
                     <p className="text-sm text-gray-500">
-                      {profile.description}
+                      {profile.id}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">

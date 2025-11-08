@@ -31,9 +31,9 @@ export interface BloomGlobalPrompt {
 
 export type AgeGroup =
   | "adolescence" // 13–17
-  | "young_adult" // 18–24
+  | "young-adult" // 18–24
   | "adult" // 25–39
-  | "middle_age"; // 40–59
+  | "middle-age"; // 40–59
 
 export interface ConversationRules {
   maxSentences: number;

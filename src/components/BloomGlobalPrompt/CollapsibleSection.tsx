@@ -22,6 +22,7 @@ export default function CollapsibleSection({
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
       <button
+        type="button"
         onClick={onToggle}
         className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
       >

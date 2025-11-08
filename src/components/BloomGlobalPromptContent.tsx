@@ -196,9 +196,9 @@ export default function BloomGlobalPromptContent() {
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
             >
               <option value="adolescence">Adolescence (13–17)</option>
-              <option value="young_adult">Young adults (18–24)</option>
+              <option value="young-adult">Young adults (18–24)</option>
               <option value="adult">Adults (25–39)</option>
-              <option value="middle_age">Middle age (40+)</option>
+              <option value="middle-age">Middle age (40+)</option>
             </select>
             <button
               onClick={generateSystemPrompt}

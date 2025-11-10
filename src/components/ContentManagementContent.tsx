@@ -3,9 +3,7 @@
 import {
   DocumentTextIcon,
   VideoCameraIcon,
-  PlusIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import FAQManagement from "./FAQManagement.tsx";
@@ -14,10 +12,10 @@ import ResourceManagement from "./ResourceManagement.tsx";
 
 export default function ContentManagementContent() {
   const [activeTab, setActiveTab] = useState("faqs");
-  const [searchQuery, setSearchQuery] = useState("");
 
   const tabs = [
     { id: "faqs", name: "FAQs", icon: DocumentTextIcon },
+    { id: "privacy", name: "Privacy", icon: ShieldCheckIcon },
     { id: "user-manual", name: "User Manual", icon: VideoCameraIcon },
   ];
 
@@ -34,14 +32,10 @@ export default function ContentManagementContent() {
               Content Management
             </h1>
             <p className="text-gray-600">
-              Manage FAQs and User Manual resources
+              Manage FAQs, Privacy Policy, and User Manual resources
             </p>
           </div>
         </div>
-        <button className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Add New
-        </button>
       </div>
 
       {/* Tabs */}
@@ -68,31 +62,11 @@ export default function ContentManagementContent() {
           </nav>
         </div>
 
-        {/* Filters + Search */}
-        <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="w-full sm:w-auto flex-1 relative">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <FunnelIcon className="h-5 w-5 text-gray-400" />
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Content Placeholder */}
-        <div className="p-8 text-center text-gray-500">
-          {activeTab === "faqs" ? <FAQManagement/> : (
-            <ResourceManagement/>
-          )}
+        {/* Tab Content */}
+        <div className="p-8">
+          {activeTab === "faqs" && <FAQManagement />}
+          {activeTab === "privacy" && <ResourceManagement type="privacy" />}
+          {activeTab === "user-manual" && <ResourceManagement type="manual" />}
         </div>
       </div>
     </div>

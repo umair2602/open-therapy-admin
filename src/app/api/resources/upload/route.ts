@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
     const uploadedBy = formData.get("uploadedBy") as string | null;
 
     if (!file) {
-      return NextResponse.json({ message: "No file provided" }, { status: 400 });
+      return NextResponse.json(
+        { message: "No file provided" },
+        { status: 400 }
+      );
     }
 
     // Only allow PDF or text-like files
@@ -70,18 +73,40 @@ export async function POST(req: NextRequest) {
 
     const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 
-    // Save metadata to MongoDB
-    const resource = await Resource.create({
-      name: file.name,
+    // Find existing active resource of this type
+    const existingResource = await Resource.findOne({
       type,
-      fileUrl,
-      mimeType: file.type,
-      size: file.size,
-      uploadedBy,
       isActive: true,
     });
 
-    return NextResponse.json(resource, { status: 201 });
+    // Update existing resource or create new one
+    let resource;
+    if (existingResource) {
+      // Update existing resource instead of creating new one
+      existingResource.name = file.name;
+      existingResource.fileUrl = fileUrl;
+      existingResource.mimeType = file.type;
+      existingResource.size = file.size;
+      if (uploadedBy) {
+        existingResource.uploadedBy = uploadedBy;
+      }
+      existingResource.isActive = true;
+      await existingResource.save();
+      resource = existingResource;
+    } else {
+      // Create new resource if none exists
+      resource = await Resource.create({
+        name: file.name,
+        type,
+        fileUrl,
+        mimeType: file.type,
+        size: file.size,
+        uploadedBy,
+        isActive: true,
+      });
+    }
+
+    return NextResponse.json(resource, { status: 200 });
   } catch (error: any) {
     console.error("Resource upload error:", error);
     return NextResponse.json(

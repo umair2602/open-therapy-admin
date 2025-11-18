@@ -4,14 +4,15 @@ import { useBooks } from "@/hooks/useBooks";
 import { useEmotionalCategories } from "@/hooks/useEmotionalCategores";
 import { getUniqueDirectionTags } from "@/lib/utils";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { get } from "http";
 import { useEffect, useMemo, useState } from "react";
+import TiptapEditor from "@/components/TipTapEditor"; // ✅ Import the editor
 
 type DraftBook = {
   _id?: string;
   category: string;
   title: string;
   description: string;
+  content?: string; // ✅ new field
   imageURL?: string;
   pdfURL?: string;
   author: string;
@@ -39,14 +40,6 @@ const supportedAreas = [
   "self_esteem",
 ];
 
-const directionTags = [
-  "calm_down",
-  "breathe",
-  "anchor_present",
-  "grounding",
-  "self_compassion",
-];
-
 export default function BooksContent() {
   const {
     books,
@@ -62,6 +55,7 @@ export default function BooksContent() {
     category: "",
     title: "",
     description: "",
+    content: "", // ✅ initialize
     imageURL: "",
     pdfURL: "",
     author: "",
@@ -71,10 +65,7 @@ export default function BooksContent() {
   });
   const { categories } = useEmotionalCategories();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
   const [directionTags, setDirectionTags] = useState<string[]>([]);
-
-  console.log("Categories", categories);
 
   const closeModal = () => {
     setModalOpen(false);
@@ -82,6 +73,7 @@ export default function BooksContent() {
       category: "",
       title: "",
       description: "",
+      content: "", // ✅ reset
       imageURL: "",
       pdfURL: "",
       author: "",
@@ -92,7 +84,6 @@ export default function BooksContent() {
   };
 
   const onSave = async () => {
-    console.log("Draft", draft);
     if (
       !draft.title ||
       !draft.category ||
@@ -118,7 +109,6 @@ export default function BooksContent() {
     setImageError(null);
     const objectUrl = URL.createObjectURL(file);
     try {
-      // Load image to validate dimensions
       const loaded = await new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
@@ -130,7 +120,6 @@ export default function BooksContent() {
       const width = loaded.width;
       const height = loaded.height;
       const isAllowed = true;
-      // (width === 72 && height === 72) || (width === 191 && height === 275);
 
       if (!isAllowed) {
         setImageError(
@@ -255,6 +244,7 @@ export default function BooksContent() {
                           category: b.category,
                           title: b.title,
                           description: b.description,
+                          content: (b as any).content || "", // ✅ load content
                           imageURL: b.imageURL,
                           pdfURL: (b as any).pdfURL,
                           author: b.author,
@@ -312,8 +302,8 @@ export default function BooksContent() {
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={closeModal} />
-          <div className="relative z-10 w-full max-w-3xl">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 max-h-[85vh] overflow-y-auto">
+          <div className="relative z-10 w-full max-w-5xl"> {/* ✅ Made wider for editor */}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">
                   {draft._id ? "Edit Book" : "New Book"}
@@ -437,11 +427,23 @@ export default function BooksContent() {
                   onChange={(e) =>
                     setDraft({ ...draft, description: e.target.value })
                   }
-                  rows={8}
+                  rows={4}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-              <div>
+
+              {/* ✅ Rich Text Content Editor */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rich Text Content
+                </label>
+                <TiptapEditor
+                  content={draft.content || ""}
+                  onChange={(html) => setDraft({ ...draft, content: html })}
+                />
+              </div>
+
+              <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Emotional Profile
                 </label>
@@ -482,7 +484,7 @@ export default function BooksContent() {
                   )}
                 </div>
               </div>
-              {/* Direction Tags */}
+
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Direction Tags
@@ -520,7 +522,6 @@ export default function BooksContent() {
                 </div>
               </div>
 
-              {/* Life Areas */}
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Life Areas

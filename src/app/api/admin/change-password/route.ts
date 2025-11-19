@@ -1,29 +1,7 @@
 import dbConnect from "@/lib/db/mongodb";
 import AdminUser from "@/models/AdminUser";
-import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "your-secret-key-change-in-production";
-
-// Helper function to verify token
-function verifyToken(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value;
-  
-  if (!token) {
-    return null;
-  }
-
-  try {
-    return jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      username: string;
-      role: string;
-    };
-  } catch (error) {
-    return null;
-  }
-}
+import { verifyToken } from "@/lib/auth";
 
 export async function PUT(request: NextRequest) {
   try {

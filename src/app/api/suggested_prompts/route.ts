@@ -1,8 +1,25 @@
 import dbConnect from "@/lib/db/mongodb";
 import SuggestedPrompt from "@/models/SuggestedPrompt";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken, hasRole } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  // Check authentication and role
+  const decoded = verifyToken(req);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
   await dbConnect();
   try {
     const { searchParams } = new URL(req.url);
@@ -27,6 +44,23 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Check authentication and role
+  const decoded = verifyToken(req);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   await dbConnect();
   try {
     const body = await req.json();

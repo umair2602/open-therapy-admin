@@ -2,8 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db/mongodb";
 import BloomGlobalPromptModel from "@/models/BloomGlobalPrompt";
 import { createSystemPrompt } from "@/lib/systemPromptUtils";
+import { verifyToken, hasRole } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  // Check authentication and role
+  const decoded = verifyToken(request);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
@@ -49,6 +67,23 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Check authentication and role
+  const decoded = verifyToken(request);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   try {
     await dbConnect();
 

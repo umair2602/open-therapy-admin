@@ -19,6 +19,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavigationItem = {
   name: string;
@@ -94,12 +95,37 @@ interface SidebarProps {
 
 export default function Sidebar({ open, setOpen }: SidebarProps) {
   const pathname = usePathname();
+  const { user, isSuperAdmin, loading } = useAuth();
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "Management",
   ]);
 
+  // Filter navigation based on user role
+  const getFilteredNavigation = () => {
+    // While auth state is loading, optimistically render full navigation to avoid flicker
+    if (loading) {
+      return navigation;
+    }
+
+    // Super admin can see everything
+    if (isSuperAdmin) {
+      return navigation;
+    }
+
+    // Normal users (admin) cannot see prompt-related items
+    return navigation.filter((item) => {
+      // Filter out "AI Prompts" section
+      if (item.name === "AI Prompts") {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const filteredNavigation = getFilteredNavigation();
+
   useEffect(() => {
-    const parents = navigation
+    const parents = filteredNavigation
       .filter(
         (item) =>
           item.children && item.children.some((c) => c.href === pathname)
@@ -113,7 +139,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
       parents.forEach((p) => setNames.add(p));
       return Array.from(setNames);
     });
-  }, [pathname]);
+  }, [pathname, filteredNavigation]);
 
   const toggleSection = (sectionName: string) => {
     setExpandedSections((prev) =>
@@ -178,7 +204,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                       <li>
                         <ul role="list" className="-mx-2 space-y-1">
-                          {navigation.map((item) => {
+                          {filteredNavigation.map((item) => {
                             if (item.children) {
                               const isExpanded = expandedSections.includes(
                                 item.name
@@ -309,7 +335,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.map((item) => {
+                  {filteredNavigation.map((item) => {
                     if (item.children) {
                       const isExpanded = expandedSections.includes(item.name);
                       const hasActiveChild = isParentActive(item.children);

@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db/mongodb";
 import CrisisPrompt from "@/models/CrisisPrompt";
+import { verifyToken, hasRole } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Check authentication and role
+  const decoded = verifyToken(req);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   await dbConnect();
   const { id } = await params;
   try {
@@ -26,6 +44,23 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Check authentication and role
+  const decoded = verifyToken(req);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   await dbConnect();
   const { id } = await params;
   try {
@@ -47,6 +82,23 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Check authentication and role
+  const decoded = verifyToken(req);
+  if (!decoded) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin can access prompt routes
+  if (!hasRole(decoded.role, "super_admin")) {
+    return NextResponse.json(
+      { error: "Forbidden: Insufficient permissions" },
+      { status: 403 }
+    );
+  }
+
   await dbConnect();
   const { id } = await params;
   try {

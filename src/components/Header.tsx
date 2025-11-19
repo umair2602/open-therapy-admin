@@ -5,6 +5,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, Cog6ToothIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, UserCircleIcon as UserCircleOutlineIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import { Fragment, useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 
 interface HeaderProps {
     onMenuClick: () => void
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick, onLogout }: HeaderProps) {
     const { theme, toggleTheme } = useTheme()
+    const { user } = useAuth()
     const [searchQuery, setSearchQuery] = useState('')
     const [notifications] = useState([
         { id: 1, message: 'New user registered', time: '2 minutes ago', type: 'info' },
@@ -139,7 +141,7 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                             </div>
                             <span className="hidden sm:flex sm:items-center">
                                 <span className="ml-2 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                                    Admin User
+                                    {user?.username || 'Admin User'}
                                 </span>
                             </span>
                         </Menu.Button>
@@ -154,8 +156,11 @@ export default function Header({ onMenuClick, onLogout }: HeaderProps) {
                         >
                             <Menu.Items className="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                                 <div className="px-4 py-2 border-b border-gray-200">
-                                    <p className="text-sm font-medium text-gray-900">Admin User</p>
-                                    <p className="text-xs text-gray-500">admin@opentherapy.com</p>
+                                    <p className="text-sm font-medium text-gray-900">{user?.username || 'Admin User'}</p>
+                                    <p className="text-xs text-gray-500">{user?.email || 'admin@opentherapy.com'}</p>
+                                    {user?.role && (
+                                        <p className="text-xs text-blue-600 mt-1 capitalize">{user.role.replace('_', ' ')}</p>
+                                    )}
                                 </div>
                                 {/* <Menu.Item>
                                     {({ active }) => (

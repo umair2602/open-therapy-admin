@@ -25,20 +25,45 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Ensure cookies are sent and received
         body: JSON.stringify({ username, password }),
       });
 
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Failed to parse response:", jsonError);
+        setError("Invalid response from server. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
       if (response.ok) {
-        const data = await response.json();
-        data.token && localStorage.setItem("adminToken", data.token);
-        router.push("/dashboard");
+        // Store token in localStorage (optional, cookie is already set)
+        if (data.token) {
+          localStorage.setItem("adminToken", data.token);
+          console.log("Token stored in localStorage");
+        }
+
+        // Check if cookie is set (for debugging)
+        console.log("Login successful, user role:", data.user?.role);
+        console.log("Response headers:", response.headers);
+
+        // Wait a moment for cookie to be set, then redirect
+        // This ensures the cookie is available when the middleware checks it
+        setTimeout(() => {
+          // Check cookies before redirect (for debugging)
+          console.log("About to redirect to dashboard");
+          window.location.href = "/dashboard";
+        }, 300);
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
+        setError(data.message || "Login failed");
+        setIsLoading(false);
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError("Network error. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };

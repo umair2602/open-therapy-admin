@@ -2,9 +2,7 @@ import dbConnect from "@/lib/db/mongodb";
 import AdminUser from "@/models/AdminUser";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "your-secret-key-change-in-production";
+import { JWT_SECRET } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {

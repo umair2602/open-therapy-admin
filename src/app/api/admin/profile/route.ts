@@ -3,28 +3,7 @@ import dbConnect from "@/lib/db/mongodb";
 import AdminUser from "@/models/AdminUser";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "your-secret-key-change-in-production";
-
-// Helper function to verify token
-function verifyToken(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value;
-  
-  if (!token) {
-    return null;
-  }
-
-  try {
-    return jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      username: string;
-      role: string;
-    };
-  } catch (error) {
-    return null;
-  }
-}
+import { verifyToken, JWT_SECRET } from "@/lib/auth";
 
 // GET - Get current admin profile
 export async function GET(request: NextRequest) {

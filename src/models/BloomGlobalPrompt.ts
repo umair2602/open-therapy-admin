@@ -33,6 +33,7 @@ export interface IResponseStructure {
   openQuestionTemplates: IQuestionTemplate[];
   validationTemplates: IValidationTemplate[];
   optionalPractices: IOptionalPractice[];
+  noActiveListeningBehaviors: string[];
 }
 
 export interface IProgressionLayers {
@@ -241,6 +242,7 @@ const ResponseStructureSchema = new Schema<IResponseStructure>(
     openQuestionTemplates: [QuestionTemplateSchema],
     validationTemplates: [ValidationTemplateSchema],
     optionalPractices: [OptionalPracticeSchema],
+    noActiveListeningBehaviors: { type: [String], required: true, default: [] },
   },
   { _id: false }
 );

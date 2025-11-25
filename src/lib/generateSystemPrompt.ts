@@ -133,6 +133,12 @@ ${responseStructure.optionalPractices
   .map((practice) => `- ${practice.text}`)
   .join("\n")}
 
+**No Active Listening Behaviors:**
+${responseStructure.noActiveListeningBehaviors
+  ?.filter((behavior) => !!behavior)
+  .map((behavior) => `- ${behavior}`)
+  .join("\n")}
+
 ---
 
 ## Progression Layers

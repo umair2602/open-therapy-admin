@@ -33,6 +33,7 @@ export default function ResponseStructureSection({
     text: "",
     enabled: true,
   });
+  const [newBehavior, setNewBehavior] = useState("");
 
   const handleInputChange = (
     field: keyof BloomGlobalPrompt["responseStructure"],
@@ -120,6 +121,44 @@ export default function ResponseStructureSection({
     });
   };
 
+  const addBehavior = () => {
+    if (!newBehavior.trim()) return;
+    updatePrompt({
+      responseStructure: {
+        ...prompt.responseStructure,
+        noActiveListeningBehaviors: [
+          ...(prompt.responseStructure.noActiveListeningBehaviors || []),
+          newBehavior,
+        ],
+      },
+    });
+    setNewBehavior("");
+  };
+
+  const removeBehavior = (index: number) => {
+    updatePrompt({
+      responseStructure: {
+        ...prompt.responseStructure,
+        noActiveListeningBehaviors: (
+          prompt.responseStructure.noActiveListeningBehaviors || []
+        ).filter((_, i) => i !== index),
+      },
+    });
+  };
+
+  const updateBehavior = (index: number, value: string) => {
+    const updated = (
+      prompt.responseStructure.noActiveListeningBehaviors || []
+    ).map((item, i) => (i === index ? value : item));
+
+    updatePrompt({
+      responseStructure: {
+        ...prompt.responseStructure,
+        noActiveListeningBehaviors: updated,
+      },
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Active Listening Template */}
@@ -136,6 +175,57 @@ export default function ResponseStructureSection({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           placeholder="I hear that you're feeling [emotion]. It sounds like [summary]. Can you tell me more about [specific aspect]?"
         />
+      </div>
+
+      {/* No Active Listening Behaviors */}
+      <div>
+        <h4 className="text-md font-medium text-gray-900 mb-3">
+          No Active Listening Behaviors
+        </h4>
+        <p className="text-sm text-gray-500 mb-3">
+          If user mentions any of these behaviors, don't actively listen and act
+          accordingly.
+        </p>
+        <div className="space-y-3">
+          {(prompt.responseStructure.noActiveListeningBehaviors || []).map(
+            (behavior, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+              >
+                <input
+                  type="text"
+                  value={behavior}
+                  onChange={(e) => updateBehavior(index, e.target.value)}
+                  placeholder="Behavior description"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <button
+                  onClick={() => removeBehavior(index)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </button>
+              </div>
+            )
+          )}
+
+          <div className="flex items-center space-x-3 p-3 border-2 border-dashed border-gray-300 rounded-lg">
+            <input
+              type="text"
+              value={newBehavior}
+              onChange={(e) => setNewBehavior(e.target.value)}
+              placeholder="Add new behavior"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button
+              onClick={addBehavior}
+              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <PlusIcon className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Open Question Templates */}
@@ -387,6 +477,8 @@ export default function ResponseStructureSection({
           </div>
         </div>
       </div>
+
+      
     </div>
   );
 }

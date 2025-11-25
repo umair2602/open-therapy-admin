@@ -86,6 +86,7 @@ export default function UsersContent() {
       disabled: user.disabled,
       parent_email: user.parent_email,
       emergency_contact: user.emergency_contact,
+      trial: user.trial, // Include trial data
     });
     setIsEditModalOpen(true);
   };
@@ -845,6 +846,89 @@ export default function UsersContent() {
                           }
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
                         />
+                      </div>
+                    </div>
+
+                    {/* Trial Management Section */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        🎁 Trial Management
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        {/* Trial Status Display */}
+                        {editFormData.trial && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700">Status:</span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                                  editFormData.trial.status === 'active' ? 'bg-green-100 text-green-800' :
+                                  editFormData.trial.status === 'expired' ? 'bg-red-100 text-red-800' :
+                                  editFormData.trial.status === 'converted' ? 'bg-purple-100 text-purple-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {editFormData.trial.status}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Active:</span>
+                                <span className="ml-2">{editFormData.trial.is_active ? '✅ Yes' : '❌ No'}</span>
+                              </div>
+                              {editFormData.trial.start_date && (
+                                <div>
+                                  <span className="font-medium text-gray-700">Start:</span>
+                                  <span className="ml-2">{new Date(editFormData.trial.start_date).toLocaleDateString()}</span>
+                                </div>
+                              )}
+                              {editFormData.trial.end_date && (
+                                <div>
+                                  <span className="font-medium text-gray-700">End:</span>
+                                  <span className="ml-2">{new Date(editFormData.trial.end_date).toLocaleDateString()}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Grant Trial Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const now = new Date();
+                            const endDate = new Date(now);
+                            endDate.setDate(endDate.getDate() + 30);
+                            
+                            setEditFormData({
+                              ...editFormData,
+                              trial: {
+                                is_active: true,
+                                status: 'active',
+                                start_date: now.toISOString(),
+                                end_date: endDate.toISOString(),
+                              }
+                            });
+                          }}
+                          className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 font-medium transition-colors"
+                        >
+                          {editFormData.trial ? '🔄 Reset 30-Day Trial' : '🎁 Grant 30-Day Trial'}
+                        </button>
+
+                        {/* Remove Trial Button */}
+                        {editFormData.trial && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditFormData({
+                                ...editFormData,
+                                trial: undefined
+                              });
+                            }}
+                            className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium transition-colors"
+                          >
+                            ❌ Remove Trial Access
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

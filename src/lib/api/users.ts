@@ -20,6 +20,13 @@ export interface User {
   parent_email?: string;
   emergency_contact?: string;
   email_verified: boolean;
+  // Free Trial - Nested Object (Optional)
+  trial?: {
+    is_active: boolean;
+    status: string; // 'active', 'expired', 'never_started', 'converted'
+    start_date: string;
+    end_date: string;
+  };
   created_at: string;
   updated_at?: string;
 }

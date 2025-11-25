@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/db/mongodb";
-import User from "@/models/User";
+import User, { type IUser } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId, UUID } from "bson";
 
@@ -21,7 +21,7 @@ export async function GET(
     try {
       user = await User.findOne({ _id: id })
         .select('-hashed_password -access_token -refresh_token -password_reset_otp -email_verification_otp')
-        .lean();
+        .lean() as IUser | null;
       
       if (user) {
         console.log("✅ SUCCESS! Found user with STRING _id");
@@ -43,7 +43,7 @@ export async function GET(
         
         user = await User.findOne({ _id: bsonId })
           .select('-hashed_password -access_token -refresh_token -password_reset_otp -email_verification_otp')
-          .lean();
+          .lean() as IUser | null;
         
         if (user) {
           console.log("✅ SUCCESS! Found user with BSON UUID");
@@ -96,7 +96,7 @@ export async function PUT(
     // TEST 1: Try with string _id (most likely to work)
     console.log("\n--- Trying STRING query ---");
     try {
-      const user = await User.findOne({ _id: id });
+      user = await User.findOne({ _id: id }) as IUser | null;
       // user = await User.findOneAndUpdate(
       //   { _id: id },
       //   { $set: updateData },
@@ -119,7 +119,7 @@ export async function PUT(
       console.log("\n--- Trying BSON UUID query ---");
       try {
         const bsonId = new UUID(id);
-        const user = await User.findOne({ _id: bsonId });
+        const user = await User.findOne({ _id: bsonId }) as IUser | null;
         // user = await User.findOneAndUpdate(
         //   { _id: bsonId },
         //   { $set: updateData },

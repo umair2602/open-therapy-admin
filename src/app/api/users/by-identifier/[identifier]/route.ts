@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/db/mongodb";
-import User from "@/models/User";
+import User, { type IUser } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -19,7 +19,7 @@ export async function GET(
       ]
     })
       .select('-hashed_password -access_token -refresh_token -password_reset_otp -email_verification_otp')
-      .lean();
+      .lean<IUser>();
     
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -56,18 +56,19 @@ export async function PUT(
     console.log("Update data:", JSON.stringify(updateData, null, 2));
     
     // Query by email OR phone
-    const user = await User.findOneAndUpdate(
-      {
-        $or: [
-          { email: identifier },
-          { phone: identifier }
-        ]
-      },
-      { $set: updateData },
-      { new: true, runValidators: true }
-    )
-      .select('-hashed_password -access_token -refresh_token -password_reset_otp -email_verification_otp')
-      .lean();
+    let user: IUser | null = null;
+    user = await User.findOneAndUpdate(
+        {
+          $or: [
+            { email: identifier },
+            { phone: identifier }
+          ]
+        },
+        { $set: updateData },
+        { new: true, runValidators: true }
+      )
+        .select('-hashed_password -access_token -refresh_token -password_reset_otp -email_verification_otp')
+        .lean<IUser>() as IUser | null;
     
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -99,7 +100,7 @@ export async function DELETE(
         { email: identifier },
         { phone: identifier }
       ]
-    }).lean();
+    }).lean<IUser>();
     
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });

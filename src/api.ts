@@ -8,4 +8,5 @@ export const API_ENDPOINTS = {
   SUGGESTED_PROMPTS: "/suggested_prompts",
   DAILY_TOOLS: "/daily_tools",
   BOOKS: "/books",
+  USERS: "/users",
 };

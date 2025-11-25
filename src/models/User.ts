@@ -1,116 +1,182 @@
-import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
+import mongoose from "mongoose";
 
 export interface IUser extends mongoose.Document {
-  name: string
-  email: string
-  phone?: string
-  dateOfBirth?: Date
-  subscription: 'Free' | 'Basic' | 'Premium'
-  status: 'Active' | 'Inactive' | 'Suspended'
-  lastActive: Date
-  joinDate: Date
-  sessions: number
-  totalTime: number
-  // Authentication fields
-  password?: string
-  googleId?: string
-  appleId?: string
-  authProvider?: 'email' | 'google' | 'apple'
-  createdAt: Date
-  updatedAt: Date
-  comparePassword(candidatePassword: string): Promise<boolean>
+  _id: string;
+  email?: string;
+  phone?: string;
+  username: string;
+  accountType: string;
+  gender: string;
+  dob: string;
+  emotionalTest?: Array<Record<string, any>>;
+  profileScores: Record<string, any>;
+  userConsent: boolean;
+  plan?: Record<string, any>;
+  hashed_password?: string;
+  disabled: boolean;
+  google_sub?: string;
+  apple_sub?: string;
+  access_token?: string;
+  refresh_token?: string;
+  token_expires_at?: Date;
+  parent_email?: string;
+  emergency_contact?: string;
+  password_reset_otp?: string;
+  password_reset_otp_expires_at?: Date;
+  email_verification_otp?: string;
+  email_verification_otp_expires_at?: Date;
+  email_verified: boolean;
+  // Free Trial - Nested Object
+  trial?: {
+    is_active: boolean;
+    status: string; // 'active', 'expired', 'never_started', 'converted'
+    start_date: Date;
+    end_date: Date;
+  };
+  created_at: Date;
+  updated_at?: Date;
 }
 
-const userSchema = new mongoose.Schema<IUser>({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
+const userSchema = new mongoose.Schema<IUser>(
+  {
+    _id: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      sparse: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    phone: {
+      type: String,
+      sparse: true,
+      unique: true,
+      trim: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    accountType: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+    },
+    dob: {
+      type: String,
+      required: true,
+    },
+    emotionalTest: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: undefined,
+    },
+    profileScores: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+      default: {},
+    },
+    userConsent: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    plan: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    hashed_password: {
+      type: String,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    google_sub: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
+    apple_sub: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
+    access_token: {
+      type: String,
+    },
+    refresh_token: {
+      type: String,
+    },
+    token_expires_at: {
+      type: Date,
+    },
+    parent_email: {
+      type: String,
+    },
+    emergency_contact: {
+      type: String,
+    },
+    password_reset_otp: {
+      type: String,
+    },
+    password_reset_otp_expires_at: {
+      type: Date,
+    },
+    email_verification_otp: {
+      type: String,
+    },
+    email_verification_otp_expires_at: {
+      type: Date,
+    },
+    email_verified: {
+      type: Boolean,
+      default: false,
+    },
+    // Free Trial - Nested Object (Optional)
+    trial: {
+      type: {
+        is_active: {
+          type: Boolean,
+          default: true,
+        },
+        status: {
+          type: String,
+          enum: ["active", "expired", "never_started", "converted"],
+          default: "never_started",
+        },
+        start_date: {
+          type: Date,
+        },
+        end_date: {
+          type: Date,
+        },
+      },
+      required: false,
+      default: undefined,
+    },
+    created_at: {
+      type: Date,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Date,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-  },
-  phone: {
-    type: String,
-    trim: true,
-  },
-  dateOfBirth: {
-    type: Date,
-  },
-  subscription: {
-    type: String,
-    enum: ['Free', 'Basic', 'Premium'],
-    default: 'Free',
-  },
-  status: {
-    type: String,
-    enum: ['Active', 'Inactive', 'Suspended'],
-    default: 'Active',
-  },
-  lastActive: {
-    type: Date,
-    default: Date.now,
-  },
-  joinDate: {
-    type: Date,
-    default: Date.now,
-  },
-  sessions: {
-    type: Number,
-    default: 0,
-  },
-  totalTime: {
-    type: Number,
-    default: 0, // in minutes
-  },
-  // Authentication fields
-  password: {
-    type: String,
-    trim: true,
-  },
-  googleId: {
-    type: String,
-    unique: true,
-    sparse: true,
-    trim: true,
-  },
-  appleId: {
-    type: String,
-    unique: true,
-    sparse: true,
-    trim: true,
-  },
-  authProvider: {
-    type: String,
-    enum: ['email', 'google', 'apple'],
-    default: 'email',
-  },
-}, {
-  timestamps: true,
-})
-
-// Hash password before saving (only if password is modified)
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password') || !this.password) return next()
-  
-  try {
-    const salt = await bcrypt.genSalt(10)
-    this.password = await bcrypt.hash(this.password, salt)
-    next()
-  } catch (error: any) {
-    next(error)
+  {
+    timestamps: false,
+    collection: "users",
+    versionKey: false,
   }
-})
+);
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
-  if (!this.password) return false
-  return bcrypt.compare(candidatePassword, this.password)
-}
-
-export default mongoose.models.User || mongoose.model<IUser>('User', userSchema)
+export default mongoose.models.User ||
+  mongoose.model<IUser>("User", userSchema);

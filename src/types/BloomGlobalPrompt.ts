@@ -49,6 +49,7 @@ export interface ResponseStructure {
   openQuestionTemplates: QuestionTemplate[];
   validationTemplates: ValidationTemplate[];
   optionalPractices: OptionalPractice[];
+  noActiveListeningBehaviors: string[];
 }
 
 export interface QuestionTemplate {
@@ -257,6 +258,7 @@ export const DEFAULT_BLOOM_GLOBAL_PROMPT: BloomGlobalPrompt = {
         enabled: true,
       },
     ],
+    noActiveListeningBehaviors: [],
   },
   progressionLayers: {
     order: ["sentir", "causa", "impacto", "passo"],

@@ -1,68 +1,149 @@
 import mongoose from 'mongoose'
 
 export interface IUser extends mongoose.Document {
-  name: string
-  email: string
+  _id: string
+  email?: string
   phone?: string
-  dateOfBirth?: Date
-  subscription: 'Free' | 'Basic' | 'Premium'
-  status: 'Active' | 'Inactive' | 'Suspended'
-  lastActive: Date
-  joinDate: Date
-  sessions: number
-  totalTime: number
-  createdAt: Date
-  updatedAt: Date
+  username: string
+  accountType: string
+  gender: string
+  dob: string
+  emotionalTest?: Array<Record<string, any>>
+  profileScores: Record<string, any>
+  userConsent: boolean
+  plan?: Record<string, any>
+  hashed_password?: string
+  disabled: boolean
+  google_sub?: string
+  apple_sub?: string
+  access_token?: string
+  refresh_token?: string
+  token_expires_at?: Date
+  parent_email?: string
+  emergency_contact?: string
+  password_reset_otp?: string
+  password_reset_otp_expires_at?: Date
+  email_verification_otp?: string
+  email_verification_otp_expires_at?: Date
+  email_verified: boolean
+  created_at: Date
+  updated_at?: Date
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-  name: {
+  _id: {
     type: String,
     required: true,
     trim: true,
   },
   email: {
     type: String,
-    required: true,
+    sparse: true,
     unique: true,
     trim: true,
     lowercase: true,
   },
   phone: {
     type: String,
+    sparse: true,
+    unique: true,
     trim: true,
   },
-  dateOfBirth: {
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  accountType: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+  },
+  dob: {
+    type: String,
+    required: true,
+  },
+  emotionalTest: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: undefined,
+  },
+  profileScores: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+    default: {},
+  },
+  userConsent: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  plan: {
+    type: mongoose.Schema.Types.Mixed,
+    default: undefined,
+  },
+  hashed_password: {
+    type: String,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  google_sub: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  apple_sub: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  access_token: {
+    type: String,
+  },
+  refresh_token: {
+    type: String,
+  },
+  token_expires_at: {
     type: Date,
   },
-  subscription: {
+  parent_email: {
     type: String,
-    enum: ['Free', 'Basic', 'Premium'],
-    default: 'Free',
   },
-  status: {
+  emergency_contact: {
     type: String,
-    enum: ['Active', 'Inactive', 'Suspended'],
-    default: 'Active',
   },
-  lastActive: {
+  password_reset_otp: {
+    type: String,
+  },
+  password_reset_otp_expires_at: {
+    type: Date,
+  },
+  email_verification_otp: {
+    type: String,
+  },
+  email_verification_otp_expires_at: {
+    type: Date,
+  },
+  email_verified: {
+    type: Boolean,
+    default: false,
+  },
+  created_at: {
     type: Date,
     default: Date.now,
   },
-  joinDate: {
+  updated_at: {
     type: Date,
-    default: Date.now,
-  },
-  sessions: {
-    type: Number,
-    default: 0,
-  },
-  totalTime: {
-    type: Number,
-    default: 0, // in minutes
   },
 }, {
-  timestamps: true,
+  timestamps: false,
+  collection: 'users',
+  versionKey: false,
 })
 
 export default mongoose.models.User || mongoose.model<IUser>('User', userSchema)

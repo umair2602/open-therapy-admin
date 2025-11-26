@@ -477,8 +477,6 @@ export default function ResponseStructureSection({
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

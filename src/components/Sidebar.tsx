@@ -59,6 +59,11 @@ const navigation: NavigationItem[] = [
         href: "/crisis-prompts",
         icon: ShieldExclamationIcon,
       },
+      {
+        name: "Safety Prompts",
+        href: "/safety-prompts",
+        icon: ShieldExclamationIcon,
+      },
     ],
   },
   {

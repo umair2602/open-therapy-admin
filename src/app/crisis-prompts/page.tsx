@@ -117,7 +117,7 @@ export default function CrisisPromptsPage() {
     );
   }
 
-  const resetForm = () =>
+  const resetForm = () => {
     setForm({
       id: "",
       slug: "",
@@ -141,17 +141,27 @@ export default function CrisisPromptsPage() {
         variations_pt: [],
       },
     });
+  };
 
   const onSubmit = async () => {
-    if (editing?._id) {
-      await updateCrisisPrompt({ id: editing._id, data: form });
-    } else {
-      await createCrisisPrompt(form);
+    try {
+      if (editing?._id) {
+        await updateCrisisPrompt({ id: editing._id, data: form });
+      } else {
+        await createCrisisPrompt(form);
+      }
+      setIsCreating(false);
+      setEditing(null);
+      resetForm();
+      refetch();
+    } catch (err: any) {
+      console.error("Failed to submit crisis prompt:", err);
+      const msg =
+        err.response?.data?.detail ||
+        err.message ||
+        "An unexpected error occurred.";
+      alert(Array.isArray(msg) ? msg.map((e) => e.msg).join(", ") : msg);
     }
-    setIsCreating(false);
-    setEditing(null);
-    resetForm();
-    refetch();
   };
 
   return (
@@ -386,133 +396,188 @@ export default function CrisisPromptsPage() {
                 onChange={(arr) => setForm({ ...form, do_not_do: arr })}
               />
               <div className="grid grid-cols-1 px-6 md:grid-cols-2 gap-4">
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="ID"
-                  value={form.id || ""}
-                  onChange={(e) => setForm({ ...form, id: e.target.value })}
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Slug"
-                  value={form.slug || ""}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Title"
-                  value={form.title || ""}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Category"
-                  value={form.category || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Level"
-                  value={form.level || ""}
-                  onChange={(e) => setForm({ ...form, level: e.target.value })}
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Jurisdiction"
-                  value={form.jurisdiction || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, jurisdiction: e.target.value })
-                  }
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ID <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="ID"
+                    value={form.id || ""}
+                    onChange={(e) => setForm({ ...form, id: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Slug <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Slug"
+                    value={form.slug || ""}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Title"
+                    value={form.title || ""}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Category"
+                    value={form.category || ""}
+                    onChange={(e) =>
+                      setForm({ ...form, category: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Level <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Level"
+                    value={form.level || ""}
+                    onChange={(e) => setForm({ ...form, level: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Jurisdiction <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Jurisdiction"
+                    value={form.jurisdiction || ""}
+                    onChange={(e) =>
+                      setForm({ ...form, jurisdiction: e.target.value })
+                    }
+                  />
+                </div>
               </div>
 
               <div className="px-6">
-                <textarea
-                className="border rounded-lg p-2 w-full"
-                rows={3}
-                placeholder="Description"
-                value={form.content?.description || ""}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    content: {
-                      ...(form.content || ({} as any)),
-                      description: e.target.value,
-                    },
-                  })
-                }
-              />
-              <textarea
-                className="border rounded-lg p-2 w-full"
-                rows={3}
-                placeholder="Base message"
-                value={form.content?.base_message || ""}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    content: {
-                      ...(form.content || ({} as any)),
-                      base_message: e.target.value,
-                    },
-                  })
-                }
-              />
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    className="border rounded-lg p-2 w-full"
+                    rows={3}
+                    placeholder="Description"
+                    value={form.content?.description || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        content: {
+                          ...(form.content || ({} as any)),
+                          description: e.target.value,
+                        },
+                      })
+                    }
+                  />
                 </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Base message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    className="border rounded-lg p-2 w-full"
+                    rows={3}
+                    placeholder="Base message"
+                    value={form.content?.base_message || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        content: {
+                          ...(form.content || ({} as any)),
+                          base_message: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 px-6 gap-4">
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Variant micro"
-                  value={form.content?.variants?.micro || ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      content: {
-                        ...(form.content || ({} as any)),
-                        variants: {
-                          ...(form.content?.variants || ({} as any)),
-                          micro: e.target.value,
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Variant micro <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Variant micro"
+                    value={form.content?.variants?.micro || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        content: {
+                          ...(form.content || ({} as any)),
+                          variants: {
+                            ...(form.content?.variants || ({} as any)),
+                            micro: e.target.value,
+                          },
                         },
-                      },
-                    })
-                  }
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Variant standard"
-                  value={form.content?.variants?.standard || ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      content: {
-                        ...(form.content || ({} as any)),
-                        variants: {
-                          ...(form.content?.variants || ({} as any)),
-                          standard: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Variant standard <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Variant standard"
+                    value={form.content?.variants?.standard || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        content: {
+                          ...(form.content || ({} as any)),
+                          variants: {
+                            ...(form.content?.variants || ({} as any)),
+                            standard: e.target.value,
+                          },
                         },
-                      },
-                    })
-                  }
-                />
-                <input
-                  className="border rounded-lg p-2"
-                  placeholder="Variant full"
-                  value={form.content?.variants?.full || ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      content: {
-                        ...(form.content || ({} as any)),
-                        variants: {
-                          ...(form.content?.variants || ({} as any)),
-                          full: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Variant full <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    className="border rounded-lg p-2 w-full"
+                    placeholder="Variant full"
+                    value={form.content?.variants?.full || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        content: {
+                          ...(form.content || ({} as any)),
+                          variants: {
+                            ...(form.content?.variants || ({} as any)),
+                            full: e.target.value,
+                          },
                         },
-                      },
-                    })
-                  }
-                />
+                      })
+                    }
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-end p-6">

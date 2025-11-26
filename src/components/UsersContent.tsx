@@ -619,7 +619,7 @@ export default function UsersContent() {
                         )}
                       </div>
 
-                      {selectedUser.plan && (
+                      {/* {selectedUser.plan && (
                         <div>
                           <label className="text-sm font-medium text-gray-500">
                             Plan Details
@@ -628,7 +628,7 @@ export default function UsersContent() {
                             {JSON.stringify(selectedUser.plan, null, 2)}
                           </pre>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   )}
 

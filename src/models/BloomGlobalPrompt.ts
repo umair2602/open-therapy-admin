@@ -100,12 +100,19 @@ export interface IBrevityAndDelivery {
   stopTriggers: IStopTrigger[];
 }
 
+export interface ISafetyPrompt {
+  id: string;
+  text: string;
+  enabled: boolean;
+}
+
 export interface ISafety {
   highRiskDirectory: string;
   triggerFile: string;
   crisisProtocolFile: string;
   interruptionMessage: string;
   blockDiagnosisPrescription: boolean;
+  safetyPrompts: ISafetyPrompt[];
 }
 
 export interface IPractice {

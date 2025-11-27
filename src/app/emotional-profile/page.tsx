@@ -351,10 +351,9 @@ function EmotionalProfileContent() {
                   <input
                     type="number"
                     value={form.id ?? ""}
-                    onChange={(e) =>
-                      setForm((s) => ({ ...s, id: Number(e.target.value) }))
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    disabled
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                    title="ID is automatically assigned"
                   />
                 </div>
                 <div>

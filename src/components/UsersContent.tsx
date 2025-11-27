@@ -19,6 +19,7 @@ import { useUsers } from "@/hooks/useUsers";
 import { useState, useMemo, Fragment } from "react";
 import { User } from "@/lib/api/users";
 import { Dialog, Transition } from "@headlessui/react";
+import { toast } from "sonner";
 
 export default function UsersContent() {
   const { users, isFetching, updateUser, deleteUser, isDeleting } = useUsers();
@@ -107,12 +108,51 @@ export default function UsersContent() {
       return;
     }
     
+    // Check if trial was just granted (comparing old vs new trial data)
+    const wasTrialGranted = 
+      !selectedUser.trial && 
+      editFormData.trial && 
+      editFormData.trial.status === 'active';
+    
     try {
       console.log("Updating user with identifier:", identifier);
       
       // Import the new function
       const { updateUserByIdentifier } = await import("@/lib/api/users");
       await updateUserByIdentifier(identifier, editFormData);
+      
+      // If trial was granted and user has email, send welcome email
+      if (wasTrialGranted && selectedUser.email && editFormData.trial) {
+        console.log("Trial was granted, sending welcome email...");
+        
+        try {
+          const emailResponse = await fetch("/api/email/send-trial-welcome", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: selectedUser.email,
+              username: selectedUser.username,
+              trialEndDate: editFormData.trial.end_date,
+            }),
+          });
+
+          const emailResult = await emailResponse.json();
+          
+          if (emailResult.success) {
+            toast.success("Trial granted and welcome email sent!");
+          } else {
+            console.error("Failed to send welcome email:", emailResult.error);
+            toast.warning("Trial granted, but email failed to send");
+          }
+        } catch (emailError) {
+          console.error("Error sending welcome email:", emailError);
+          toast.warning("Trial granted, but email failed to send");
+        }
+      } else {
+        toast.success("User updated successfully");
+      }
       
       setIsEditModalOpen(false);
       setSelectedUser(null);
@@ -121,7 +161,7 @@ export default function UsersContent() {
       window.location.reload();
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("Failed to update user. Check console for details.");
+      toast.error("Failed to update user");
     }
   };
 

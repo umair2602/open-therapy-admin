@@ -4,12 +4,13 @@ import SafetyPrompt from "@/models/SafetyPrompt";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
+    const { id } = await params;
     const body = await req.json();
-    const prompt = await SafetyPrompt.findByIdAndUpdate(params.id, body, {
+    const prompt = await SafetyPrompt.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -33,11 +34,12 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const prompt = await SafetyPrompt.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const prompt = await SafetyPrompt.findByIdAndDelete(id);
 
     if (!prompt) {
       return NextResponse.json(

@@ -102,7 +102,7 @@ export interface IBrevityAndDelivery {
 
 export interface ISafetyPrompt {
   id: string;
-  text: string;
+  content: string;
   enabled: boolean;
 }
 
@@ -352,6 +352,15 @@ const BrevityAndDeliverySchema = new Schema<IBrevityAndDelivery>(
   { _id: false }
 );
 
+const SafetyPromptSchema = new Schema<ISafetyPrompt>(
+  {
+    id: { type: String, required: true },
+    content: { type: String, required: true },
+    enabled: { type: Boolean, required: true },
+  },
+  { _id: false }
+);
+
 const SafetySchema = new Schema<ISafety>(
   {
     highRiskDirectory: { type: String, required: true },
@@ -359,6 +368,7 @@ const SafetySchema = new Schema<ISafety>(
     crisisProtocolFile: { type: String, required: true },
     interruptionMessage: { type: String, required: true },
     blockDiagnosisPrescription: { type: Boolean, required: true },
+    safetyPrompts: { type: [SafetyPromptSchema], required: true, default: [] },
   },
   { _id: false }
 );

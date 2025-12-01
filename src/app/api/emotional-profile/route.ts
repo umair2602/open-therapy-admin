@@ -21,12 +21,19 @@ export async function POST(req: Request) {
       body.id = Number.isFinite(num) ? Number(num) : body.questionId;
     }
     await dbConnect();
-    // upsert by numeric id to keep provided ids stable
+    
+    // If updating an existing question
     const existing = await EmotionalQuestion.findOne({ id: body.id });
     if (existing) {
       existing.set(body);
       await existing.save();
       return NextResponse.json(existing);
+    }
+
+    // Auto-increment ID for new questions
+    if (!body.id || body.id === null || body.id === undefined) {
+      const maxDoc = await EmotionalQuestion.findOne().sort({ id: -1 }).lean();
+      body.id = maxDoc ? maxDoc.id + 1 : 1;
     }
 
     const created = await EmotionalQuestion.create(body);

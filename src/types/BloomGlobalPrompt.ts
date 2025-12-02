@@ -136,12 +136,19 @@ export interface StopTrigger {
   enabled: boolean;
 }
 
+export interface SafetyPrompt {
+  id: string;
+  content: string;
+  enabled: boolean;
+}
+
 export interface Safety {
   highRiskDirectory: string;
   triggerFile: string;
   crisisProtocolFile: string;
   interruptionMessage: string;
   blockDiagnosisPrescription: boolean;
+  safetyPrompts: SafetyPrompt[];
 }
 
 export interface QuickTools {
@@ -565,6 +572,7 @@ export const DEFAULT_BLOOM_GLOBAL_PROMPT: BloomGlobalPrompt = {
     interruptionMessage:
       "I'm concerned about your safety. Please consider reaching out to a crisis helpline or emergency services.",
     blockDiagnosisPrescription: true,
+    safetyPrompts: [],
   },
   quickTools: {
     practices: [

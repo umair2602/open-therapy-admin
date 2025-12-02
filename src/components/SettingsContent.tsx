@@ -10,6 +10,8 @@ import {
   Users,
   Plus,
   X,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
@@ -38,6 +40,9 @@ export default function SettingsContent() {
   const [adminUsers, setAdminUsers] = useState<any[]>([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
   const [newAdminData, setNewAdminData] = useState({
     username: "",
     email: "",
@@ -45,7 +50,15 @@ export default function SettingsContent() {
     confirmPassword: "",
     role: "admin",
   });
+  const [editAdminData, setEditAdminData] = useState({
+    username: "",
+    email: "",
+    role: "admin",
+    isActive: true,
+  });
   const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [updatingAdmin, setUpdatingAdmin] = useState(false);
+  const [deletingAdmin, setDeletingAdmin] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -157,6 +170,84 @@ export default function SettingsContent() {
       setCreatingAdmin(false);
     }
   };
+
+  const handleEditAdmin = (admin: any) => {
+    setSelectedAdmin(admin);
+    setEditAdminData({
+      username: admin.username,
+      email: admin.email,
+      role: admin.role,
+      isActive: admin.isActive,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateAdmin = async () => {
+    if (!selectedAdmin) return;
+
+    if (!editAdminData.username || !editAdminData.email) {
+      showErrorToast("Username and email are required");
+      return;
+    }
+
+    setUpdatingAdmin(true);
+    try {
+      const response = await fetch(`/api/admin/users/${selectedAdmin._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editAdminData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showSuccessToast("Admin user updated successfully!");
+        setShowEditModal(false);
+        setSelectedAdmin(null);
+        fetchAdminUsers();
+      } else {
+        showErrorToast(data.message || "Failed to update admin user");
+      }
+    } catch (error) {
+      console.error("Failed to update admin user:", error);
+      showErrorToast("An error occurred. Please try again.");
+    } finally {
+      setUpdatingAdmin(false);
+    }
+  };
+
+  const handleDeleteAdmin = (admin: any) => {
+    setSelectedAdmin(admin);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDeleteAdmin = async () => {
+    if (!selectedAdmin) return;
+
+    setDeletingAdmin(true);
+    try {
+      const response = await fetch(`/api/admin/users/${selectedAdmin._id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showSuccessToast("Admin user deleted successfully!");
+        setShowDeleteModal(false);
+        setSelectedAdmin(null);
+        fetchAdminUsers();
+      } else {
+        showErrorToast(data.message || "Failed to delete admin user");
+      }
+    } catch (error) {
+      console.error("Failed to delete admin user:", error);
+      showErrorToast("An error occurred. Please try again.");
+    } finally {
+      setDeletingAdmin(false);
+    }
+  };
+
 
   const tabs = [
     { id: "general", name: "General", icon: Settings },
@@ -650,6 +741,9 @@ export default function SettingsContent() {
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Created
                               </th>
+                              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="bg-white divide-y divide-gray-200">
@@ -701,6 +795,22 @@ export default function SettingsContent() {
                                         admin.createdAt
                                       ).toLocaleDateString()
                                     : "-"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                  <button
+                                    onClick={() => handleEditAdmin(admin)}
+                                    className="text-blue-600 hover:text-blue-900 mr-3"
+                                    title="Edit admin"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteAdmin(admin)}
+                                    className="text-red-600 hover:text-red-900"
+                                    title="Delete admin"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
                                 </td>
                               </tr>
                             ))}
@@ -851,6 +961,169 @@ export default function SettingsContent() {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {creatingAdmin ? "Creating..." : "Create Admin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Admin Modal */}
+      {showEditModal && selectedAdmin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Edit Admin User
+              </h3>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedAdmin(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  value={editAdminData.username}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      username: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter username"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={editAdminData.email}
+                  onChange={(e) =>
+                    setEditAdminData({ ...editAdminData, email: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter email"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role *
+                </label>
+                <select
+                  value={editAdminData.role}
+                  onChange={(e) =>
+                    setEditAdminData({ ...editAdminData, role: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                  <option value="moderator">Moderator</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={editAdminData.isActive}
+                    onChange={(e) =>
+                      setEditAdminData({
+                        ...editAdminData,
+                        isActive: e.target.checked,
+                      })
+                    }
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Active
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedAdmin(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateAdmin}
+                disabled={updatingAdmin}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updatingAdmin ? "Updating..." : "Update Admin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Admin Modal */}
+      {showDeleteModal && selectedAdmin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Delete Admin User
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedAdmin(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-700">
+                Are you sure you want to delete the admin user{" "}
+                <span className="font-semibold">{selectedAdmin.username}</span>?
+              </p>
+              <p className="text-sm text-red-600 mt-2">
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedAdmin(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDeleteAdmin}
+                disabled={deletingAdmin}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deletingAdmin ? "Deleting..." : "Delete Admin"}
               </button>
             </div>
           </div>
